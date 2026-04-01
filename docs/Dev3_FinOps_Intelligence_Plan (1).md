@@ -693,6 +693,7 @@ Run: parse CSV → analyze patterns → estimate costs → build comparison. Ver
 ```python
 # agents/finops.py
 import json
+from llm import call_llm_async
 from agents.billing_parser import parse_billing_csv
 from agents.pattern_analyzer import analyze_patterns
 from agents.cost_engine import estimate_aws_costs
@@ -713,7 +714,7 @@ Use specific dollar amounts. Be confident and precise. No jargon — a CFO shoul
 
 Respond with ONLY the summary text, no JSON, no markdown headers."""
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     billing_raw = context.get("gcp_billing_raw", [])
     aws_mappings = context.get("aws_mapping", [])
 
@@ -740,7 +741,7 @@ async def run(context: dict, claude_client) -> dict:
     # Step 4: Build monthly comparison
     comparison = build_monthly_comparison(df, cost_results)
 
-    # Step 5: Generate natural language summary via Claude
+    # Step 5: Generate natural language summary via Bedrock
     summary_input = {
         "patterns": patterns,
         "cost_results": cost_results,
@@ -748,17 +749,14 @@ async def run(context: dict, claude_client) -> dict:
     }
 
     try:
-        response = claude_client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            temperature=0,
+        summary = await call_llm_async(
             system=FINOPS_SUMMARY_PROMPT,
             messages=[{
                 "role": "user",
                 "content": f"Generate a cost summary from this data:\n{json.dumps(summary_input, indent=2)}"
             }]
         )
-        summary = response.content[0].text.strip()
+        summary = summary.strip()
     except Exception:
         summary = (
             f"Your current GCP environment costs approximately "
@@ -922,4 +920,6 @@ Fix: You have a hardcoded fallback summary that uses f-strings with the actual n
 4. **Cut live AWS adapters before cutting the schema** — keep `pricing_sources`, `optimizer_recommendations`, and `watchdog_baseline` even if they come from fallbacks.
 5. **Cut ElastiCache/Lambda/Fargate pricing** — focus on EC2 and RDS. These two services drive 80% of RI savings.
 6. **Never cut the RI recommendations** — this is the core deliverable.
+7. **Never cut `total_first_year_savings`** — this is the hero number. Without it, you don't have a demo.
+erable.
 7. **Never cut `total_first_year_savings`** — this is the hero number. Without it, you don't have a demo.

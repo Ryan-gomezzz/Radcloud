@@ -241,11 +241,12 @@ GCP_SERVICES = {
 }
 ```
 
-**Step 2 — The Discovery Agent with Claude**
+**Step 2 — The Discovery Agent with Bedrock**
 
 ```python
 # agents/discovery.py
 import json
+from llm import call_llm_async
 
 DISCOVERY_SYSTEM_PROMPT = """You are a GCP infrastructure analyst. You will receive raw infrastructure configuration (Terraform HCL, YAML, or gcloud CLI output). Your job is to extract every GCP resource into a structured inventory.
 
@@ -260,7 +261,7 @@ If you encounter a resource type not in the known list, still include it with re
 
 Respond ONLY with a JSON array. No markdown, no explanation, no backticks."""
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     gcp_config = context.get("gcp_config_raw", "")
 
     if not gcp_config.strip():
@@ -271,10 +272,7 @@ async def run(context: dict, claude_client) -> dict:
         }]
         return context
 
-    response = claude_client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=4096,
-        temperature=0,
+    raw_text = await call_llm_async(
         system=DISCOVERY_SYSTEM_PROMPT,
         messages=[{
             "role": "user",
@@ -282,7 +280,7 @@ async def run(context: dict, claude_client) -> dict:
         }]
     )
 
-    raw_text = response.content[0].text.strip()
+    raw_text = raw_text.strip()
     # Clean potential markdown fencing
     if raw_text.startswith("```"):
         raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
@@ -293,7 +291,7 @@ async def run(context: dict, claude_client) -> dict:
         context["gcp_inventory"] = []
         context["errors"] = context.get("errors", []) + [{
             "agent": "discovery",
-            "error": "Failed to parse Claude response as JSON"
+            "error": "Failed to parse Bedrock response as JSON"
         }]
         return context
 
@@ -737,27 +735,8 @@ Now make it handle real-world messiness:
 - If the Terraform is very long (>50 resources), Claude's response might get truncated. Handle this by chunking: split the input into groups of 15–20 resources, run Discovery on each chunk, merge results.
 
 **Retry logic:**
-- Add a simple retry wrapper for Claude API calls: retry up to 2 times with 2-second delay on failure.
+- Retry logic is handled centrally in `backend/llm.py` via the `call_llm_async` function, which supports configurable retries and exponential backoff on throttling or timeout.
 
-```python
-import asyncio
-
-async def call_claude_with_retry(claude_client, messages, system, max_retries=2):
-    for attempt in range(max_retries + 1):
-        try:
-            response = claude_client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=4096,
-                temperature=0,
-                system=system,
-                messages=messages,
-            )
-            return response
-        except Exception as e:
-            if attempt == max_retries:
-                raise
-            await asyncio.sleep(2)
-```
 
 ### Hours 16–20: Polish + Demo Support
 
@@ -812,3 +791,8 @@ Fix: The deterministic mapping handles the service-level mapping. Claude handles
 4. **Never cut the mapping table** — this is your core deliverable. Without it, Dev 3 and Dev 4 have nothing to work with.
 5. **Never cut the gap flags** — judges want to see that the tool identifies what doesn't translate cleanly. That's what makes it credible.
 6. **Never cut Terraform / observability hints** — without them, the product cannot honestly claim generated IaC and Watchdog support.
+lity hints** — without them, the product cannot honestly claim generated IaC and Watchdog support.
+ever cut the mapping table** — this is your core deliverable. Without it, Dev 3 and Dev 4 have nothing to work with.
+5. **Never cut the gap flags** — judges want to see that the tool identifies what doesn't translate cleanly. That's what makes it credible.
+6. **Never cut Terraform / observability hints** — without them, the product cannot honestly claim generated IaC and Watchdog support.
+lity hints** — without them, the product cannot honestly claim generated IaC and Watchdog support.

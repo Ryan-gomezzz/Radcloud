@@ -3,7 +3,7 @@
 **Project:** RADCloud  
 **Role:** Risk Agent, Watchdog Agent, Runbook + IaC Generator, Demo Data Architect  
 **Time Budget:** 24 hours  
-**Stack:** Python, Claude API (claude-sonnet-4-20250514)  
+**Stack:** Python, AWS Bedrock (Claude) via `backend/llm.py`  
 **Dependencies inbound:** `gcp_inventory` and `aws_mapping` from Dev 2 (available after hour 8). You can build risk templates and the runbook structure independently before then.  
 **Dependencies outbound:** Dev 1 (Frontend) renders your risk report, runbook, watchdog, and IaC tabs. Dev 3 (FinOps) uses your sample billing CSV. Everyone uses your sample Terraform for the demo.
 
@@ -1043,11 +1043,12 @@ The Watchdog output is not just a chart payload. It is the post-migration operat
 
 **Step 2 — Runbook structure template**
 
-The runbook follows a fixed phase structure. Claude fills in the specific steps based on the migration context.
+The runbook follows a fixed phase structure. Bedrock (Claude) fills in the specific steps based on the migration context.
 
 ```python
 # agents/runbook.py
 import json
+from llm import call_llm_async
 
 RUNBOOK_SYSTEM_PROMPT = """You are a cloud migration project manager creating a migration runbook for a GCP-to-AWS migration. You will receive:
 1. GCP resource inventory
@@ -1081,13 +1082,13 @@ Also generate:
 
 Respond ONLY with a JSON object matching this structure. No markdown, no backticks."""
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     inventory = context.get("gcp_inventory", [])
     mapping = context.get("aws_mapping", [])
     risks = context.get("risks", [])
     finops = context.get("finops", {})
 
-    # Build a concise context summary for Claude (don't send raw data — too long)
+    # Build a concise context summary for Bedrock (don't send raw data — too long)
     resource_summary = {}
     for r in inventory:
         rtype = r.get("resource_type", "other")
@@ -1107,7 +1108,7 @@ async def run(context: dict, claude_client) -> dict:
     for rec in finops.get("ri_recommendations", []):
         ri_summary.append(f"{rec['quantity']}x {rec['instance_type']} {rec['aws_service']} RI — saves ${rec['annual_savings']:,.0f}/yr")
 
-    context_for_claude = {
+    context_for_bedrock = {
         "resource_counts": resource_summary,
         "total_resources": len(inventory),
         "mapping_summary": mapping_summary,
@@ -1117,18 +1118,15 @@ async def run(context: dict, claude_client) -> dict:
     }
 
     try:
-        response = claude_client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=4096,
-            temperature=0,
+        raw_text = await call_llm_async(
             system=RUNBOOK_SYSTEM_PROMPT,
             messages=[{
                 "role": "user",
-                "content": f"Generate the migration runbook from this context:\n{json.dumps(context_for_claude, indent=2)}"
+                "content": f"Generate the migration runbook from this context:\n{json.dumps(context_for_bedrock, indent=2)}"
             }]
         )
 
-        raw_text = response.content[0].text.strip()
+        raw_text = raw_text.strip()
         if raw_text.startswith("```"):
             raw_text = raw_text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
 
