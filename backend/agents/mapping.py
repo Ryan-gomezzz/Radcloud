@@ -194,6 +194,10 @@ async def run(context: dict) -> dict:
     if narrative:
         context["aws_architecture"]["summary"] = narrative
 
+    # --- Final schema validation (Task 4.3) ---
+    context["aws_mapping"] = _validate_mapping_output(rows)
+    context["aws_architecture"] = _validate_architecture(context["aws_architecture"])
+
     return context
 
 
@@ -650,3 +654,152 @@ async def _generate_narrative(
         return None
 
     return text
+
+
+# ---------------------------------------------------------------------------
+# Final schema validation (Task 4.3)
+# ---------------------------------------------------------------------------
+
+_MAPPING_REQUIRED_FIELDS: dict[str, type] = {
+    "gcp_resource_id": str,
+    "gcp_service": str,
+    "gcp_type": str,
+    "gcp_config_summary": str,
+    "aws_service": str,
+    "aws_type": str,
+    "aws_config": dict,
+    "mapping_confidence": str,
+    "gap_flag": bool,
+    # gap_notes can be str or None
+    "terraform_hints": dict,
+    "observability_hooks": dict,
+    "watchdog_priority": str,
+    "target_runtime": str,
+}
+
+_ARCH_REQUIRED_KEYS = (
+    "summary", "services_used", "networking",
+    "total_resources", "direct_mappings", "partial_mappings", "no_equivalent",
+)
+
+
+def _validate_mapping_row(row: dict, idx: int) -> dict[str, Any]:
+    """Validate and repair a single mapping row.
+
+    Ensures all required fields exist with correct types.  Missing fields
+    are filled with safe defaults; wrong types are coerced where possible.
+    Returns the (possibly repaired) row.
+    """
+    for field, expected_type in _MAPPING_REQUIRED_FIELDS.items():
+        if field not in row:
+            # Fill missing field with a safe default.
+            if expected_type is str:
+                row[field] = ""
+            elif expected_type is dict:
+                row[field] = {}
+            elif expected_type is bool:
+                row[field] = False
+            logger.warning(
+                "Mapping agent: row %d missing '%s', filled default", idx, field
+            )
+        elif not isinstance(row[field], expected_type):
+            # Try to coerce.
+            try:
+                row[field] = expected_type(row[field])
+            except (TypeError, ValueError):
+                if expected_type is str:
+                    row[field] = str(row[field])
+                elif expected_type is dict:
+                    row[field] = {}
+                elif expected_type is bool:
+                    row[field] = bool(row[field])
+                logger.warning(
+                    "Mapping agent: row %d field '%s' had wrong type, coerced",
+                    idx, field,
+                )
+
+    # gap_notes: must be str or None.
+    gn = row.get("gap_notes")
+    if gn is not None and not isinstance(gn, str):
+        row["gap_notes"] = str(gn)
+
+    # Ensure aws_config is never None.
+    if row.get("aws_config") is None:
+        row["aws_config"] = {}
+
+    # Ensure mapping_confidence is a valid value.
+    if row["mapping_confidence"] not in ("direct", "partial", "none"):
+        row["mapping_confidence"] = "partial"
+        row["gap_flag"] = True
+
+    # Ensure watchdog_priority is valid.
+    if row["watchdog_priority"] not in ("low", "medium", "high", "critical"):
+        row["watchdog_priority"] = "medium"
+
+    return row
+
+
+def _validate_mapping_output(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Validate all mapping rows and log a summary.
+
+    Runs ``_validate_mapping_row`` on each row.  This is the final gate
+    before the mapping output is written to context — it guarantees
+    downstream agents always receive well-formed data.
+    """
+    repaired = 0
+    for idx, row in enumerate(rows):
+        before_keys = set(row.keys())
+        _validate_mapping_row(row, idx)
+        if set(row.keys()) != before_keys:
+            repaired += 1
+
+    if repaired > 0:
+        logger.info(
+            "Mapping agent: repaired %d/%d rows during final validation",
+            repaired, len(rows),
+        )
+
+    return rows
+
+
+def _validate_architecture(arch: dict[str, Any]) -> dict[str, Any]:
+    """Ensure the architecture dict has all required keys.
+
+    Fills missing keys with safe defaults so the frontend never crashes.
+    """
+    defaults = {
+        "summary": _ARCH_SUMMARY,
+        "services_used": [],
+        "networking": {
+            "vpc_count": 1,
+            "subnet_strategy": "public + private per AZ",
+            "security_groups": [],
+        },
+        "total_resources": 0,
+        "direct_mappings": 0,
+        "partial_mappings": 0,
+        "no_equivalent": 0,
+    }
+
+    for key in _ARCH_REQUIRED_KEYS:
+        if key not in arch:
+            arch[key] = defaults[key]
+            logger.warning(
+                "Mapping agent: architecture missing '%s', filled default", key
+            )
+
+    # Validate summary is a non-empty string.
+    if not isinstance(arch["summary"], str) or len(arch["summary"]) < 10:
+        arch["summary"] = _ARCH_SUMMARY
+        logger.warning("Mapping agent: architecture summary invalid, using fallback")
+
+    # Validate services_used is a list.
+    if not isinstance(arch["services_used"], list):
+        arch["services_used"] = []
+
+    # Validate numeric fields.
+    for nfield in ("total_resources", "direct_mappings", "partial_mappings", "no_equivalent"):
+        if not isinstance(arch.get(nfield), (int, float)):
+            arch[nfield] = 0
+
+    return arch
