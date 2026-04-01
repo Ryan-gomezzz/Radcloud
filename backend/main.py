@@ -5,20 +5,44 @@ from __future__ import annotations
 import csv
 import io
 import json
+import logging
 import os
 import sys
+from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import FastAPI, Form, Request, UploadFile
+from fastapi import Depends, FastAPI, Form, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from agents import discovery, finops, mapping, risk, watchdog
+from agents import discovery, finops, mapping, planner, risk, watchdog
+from db.database import init_db
+from db.models import User
 from llm import call_llm_async
+from rag.store import build_store
+from routers import auth, cloud, execution, pipeline, sessions
+from routers.auth import get_current_user_optional
+from routers.pipeline import register_migration_plan
 
-app = FastAPI(title="RADCloud API")
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        await init_db()
+    except Exception:
+        logger.exception("init_db failed — SQLite auth/session features may be unavailable")
+    try:
+        await build_store()
+    except Exception:
+        logger.exception("build_store failed — RAG may be empty; agents continue with stubs")
+    yield
+
+
+app = FastAPI(title="RADCloud API", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -26,12 +50,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
+app.include_router(cloud.router)
+app.include_router(sessions.router)
+app.include_router(pipeline.router)
+app.include_router(execution.router)
+
 PIPELINE: list[tuple[str, Any]] = [
     ("discovery", discovery.run),
     ("mapping", mapping.run),
     ("risk", risk.run),
     ("finops", finops.run),
     ("watchdog", watchdog.run),
+    ("planner", planner.run),
 ]
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -65,6 +96,12 @@ async def _run_pipeline(context: dict) -> dict:
             context.setdefault("errors", []).append({"agent": agent_name, "error": str(e)})
     context["status"] = "complete"
     return context
+
+
+def _register_plan_if_authed(context: dict, current_user: User | None) -> None:
+    mp = context.get("migration_plan")
+    if current_user and isinstance(mp, dict) and mp.get("plan_id"):
+        register_migration_plan(current_user.id, mp)
 
 
 @app.get("/health")
@@ -223,6 +260,7 @@ Always include this state block. Update it as you collect information."""
 
 @app.post("/analyze")
 async def analyze(
+    current_user: Annotated[User | None, Depends(get_current_user_optional)],
     terraform_config: str = Form(...),
     billing_csv: UploadFile | None = None,
 ):
@@ -233,6 +271,9 @@ async def analyze(
             content = await billing_csv.read()
             reader = csv.DictReader(io.StringIO(content.decode("utf-8")))
             out["gcp_billing_raw"] = [row for row in reader]
+        if not out.get("migration_plan"):
+            out["migration_plan"] = planner.stub_migration_plan()
+        _register_plan_if_authed(out, current_user)
         return out
 
     context: dict = {
@@ -247,11 +288,14 @@ async def analyze(
         reader = csv.DictReader(io.StringIO(content.decode("utf-8")))
         context["gcp_billing_raw"] = [row for row in reader]
 
-    return await _run_pipeline(context)
+    out = await _run_pipeline(context)
+    _register_plan_if_authed(out, current_user)
+    return out
 
 
 @app.post("/analyze-stream")
 async def analyze_stream(
+    current_user: Annotated[User | None, Depends(get_current_user_optional)],
     terraform_config: str = Form(...),
     billing_csv: UploadFile | None = None,
 ):
@@ -262,6 +306,9 @@ async def analyze_stream(
             content = await billing_csv.read()
             reader = csv.DictReader(io.StringIO(content.decode("utf-8")))
             out["gcp_billing_raw"] = [row for row in reader]
+        if not out.get("migration_plan"):
+            out["migration_plan"] = planner.stub_migration_plan()
+        _register_plan_if_authed(out, current_user)
 
         async def demo_events():
             yield f"data: {json.dumps({'status': 'complete', 'message': 'Demo mode — cached result', 'result': out})}\n\n"
@@ -290,6 +337,7 @@ async def analyze_stream(
                 context.setdefault("errors", []).append({"agent": agent_name, "error": str(e)})
             yield f"data: {json.dumps({'status': agent_name, 'message': f'{agent_name} complete', 'partial': context})}\n\n"
         context["status"] = "complete"
+        _register_plan_if_authed(context, current_user)
         yield f"data: {json.dumps({'status': 'complete', 'result': context})}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")

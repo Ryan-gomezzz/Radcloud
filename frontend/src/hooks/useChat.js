@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { API_BASE } from "../api";
+import { API_BASE, authHeaders } from "../api";
 
 export const useChat = (tts) => {
   const [messages, setMessages] = useState([]);
@@ -25,7 +25,7 @@ export const useChat = (tts) => {
     try {
       const response = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ messages: updatedMessages }),
       });
       
