@@ -1,11 +1,120 @@
 @import "tailwindcss";
 
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a2e;
+  --bg-card: #16161f;
+  --border-card: #2a2a3e;
+  --border-card-hover: #3a3a5e;
+  --accent-teal: #00d4aa;
+  --accent-blue: #4a9eff;
+  --text-muted: #6b7280;
+  --text-body: #d1d5db;
+  --text-heading: #f9fafb;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --finops-purple: #a855f7;
+  --watchdog-pink: #ec4899;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  font-family: Inter, system-ui, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  background: var(--bg-primary);
+  color: var(--text-body);
 }
 
 #root {
   min-height: 100vh;
+}
+
+.font-mono-code {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Card base */
+.rad-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 20px 24px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rad-card:hover {
+  border-color: var(--border-card-hover);
+}
+
+/* Primary button */
+.btn-primary {
+  background: linear-gradient(135deg, #00d4aa, #00b894);
+  color: #0a0a0f;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.25);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Outline button */
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-card);
+  color: var(--text-body);
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-teal);
+  color: var(--accent-teal);
+}
+
+/* Tab content fade */
+.tab-panel-enter {
+  animation: tabFade 0.25s ease-out;
+}
+
+@keyframes tabFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroNumber {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-hero-number {
+  animation: heroNumber 0.8s ease-out forwards;
 }

@@ -4,6 +4,8 @@ import { ArchitectureTab } from "./tabs/ArchitectureTab";
 import { RisksTab } from "./tabs/RisksTab";
 import { FinOpsTab } from "./tabs/FinOpsTab";
 import { RunbookTab } from "./tabs/RunbookTab";
+import { WatchdogTab } from "./tabs/WatchdogTab";
+import { IaCOutputTab } from "./tabs/IaCOutputTab";
 
 const TABS = [
   { id: "assets", label: "Asset map" },
@@ -11,38 +13,43 @@ const TABS = [
   { id: "risks", label: "Risks" },
   { id: "finops", label: "FinOps plan" },
   { id: "runbook", label: "Runbook" },
+  { id: "watchdog", label: "Watchdog" },
+  { id: "iac", label: "IaC output" },
 ];
 
-export function ResultsPanel({ result }) {
-  const [tab, setTab] = useState("finops");
+export function ResultsPanel({ result, initialTab = "finops" }) {
+  const [tab, setTab] = useState(initialTab);
 
   if (!result) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/80 p-8 text-center text-slate-500">
+      <div className="rad-card border-dashed py-16 text-center text-[#6b7280]">
         Run an analysis to see results here.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-wrap gap-1 border-b border-slate-200 bg-slate-50 p-2">
+    <div className="overflow-hidden rounded-xl border border-[#2a2a3e] bg-[#16161f]">
+      <div className="flex flex-wrap gap-0 border-b border-[#2a2a3e] px-2 pt-2">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`rounded-lg px-3 py-2 text-sm font-medium ${
+            className={`relative px-4 py-3 text-sm font-medium transition-colors duration-200 ${
               tab === t.id
-                ? "bg-white text-blue-900 shadow-sm ring-1 ring-slate-200"
-                : "text-slate-600 hover:bg-white/80"
+                ? "text-[#00d4aa]"
+                : "text-[#6b7280] hover:text-[#d1d5db]"
             }`}
           >
             {t.label}
+            {tab === t.id && (
+              <span className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[#00d4aa]" />
+            )}
           </button>
         ))}
       </div>
-      <div className="p-6">
+      <div className="tab-panel-enter p-6">
         {tab === "assets" && <AssetMapTab inventory={result.gcp_inventory} />}
         {tab === "arch" && (
           <ArchitectureTab
@@ -50,9 +57,13 @@ export function ResultsPanel({ result }) {
             awsArchitecture={result.aws_architecture}
           />
         )}
-        {tab === "risks" && <RisksTab risks={result.risks} />}
+        {tab === "risks" && (
+          <RisksTab risks={result.risks} riskSummary={result.risk_summary} />
+        )}
         {tab === "finops" && <FinOpsTab finops={result.finops} />}
         {tab === "runbook" && <RunbookTab runbook={result.runbook} />}
+        {tab === "watchdog" && <WatchdogTab watchdog={result.watchdog} />}
+        {tab === "iac" && <IaCOutputTab iacBundle={result.iac_bundle} />}
       </div>
     </div>
   );

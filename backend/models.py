@@ -11,7 +11,7 @@ class AgentError(BaseModel):
 
 
 class RADCloudContext(BaseModel):
-    """Canonical context shape passed through the pipeline (subset; extend as agents land)."""
+    """Canonical context shape passed through the pipeline."""
 
     model_config = ConfigDict(extra="allow")
 
@@ -19,9 +19,13 @@ class RADCloudContext(BaseModel):
     gcp_billing_raw: list[dict[str, Any]] = Field(default_factory=list)
     status: str = "starting"
     errors: list[dict[str, Any]] = Field(default_factory=list)
+
     gcp_inventory: list[dict[str, Any]] | None = None
     aws_mapping: list[dict[str, Any]] | None = None
-    aws_architecture: str | None = None
+    aws_architecture: dict[str, Any] | None = None
     risks: list[dict[str, Any]] | None = None
+    risk_summary: dict[str, Any] | None = None
     finops: dict[str, Any] | None = None
-    runbook: list[dict[str, Any]] | str | None = None
+    runbook: dict[str, Any] | list[dict[str, Any]] | str | None = None
+    watchdog: dict[str, Any] | None = None
+    iac_bundle: dict[str, Any] | None = None

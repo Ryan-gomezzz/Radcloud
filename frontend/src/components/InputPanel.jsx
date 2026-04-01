@@ -1,8 +1,25 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-export function InputPanel({ onSubmit, isLoading, onTrySample }) {
-  const [terraform, setTerraform] = useState("");
-  const [billingFile, setBillingFile] = useState(null);
+export function InputPanel({
+  terraform,
+  onTerraformChange,
+  billingFile,
+  onBillingFileChange,
+  onSubmit,
+  isLoading,
+  onTrySample,
+}) {
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+      setDragOver(false);
+      const f = e.dataTransfer.files?.[0];
+      if (f && f.name.endsWith(".csv")) onBillingFileChange(f);
+    },
+    [onBillingFileChange],
+  );
 
   const handleSubmit = () => {
     const formData = new FormData();
@@ -12,46 +29,75 @@ export function InputPanel({ onSubmit, isLoading, onTrySample }) {
   };
 
   return (
-    <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <label className="block text-sm font-medium text-slate-700">
-        Terraform / YAML
+    <div className="rad-card space-y-5">
+      <div>
+        <label className="text-[11px] font-medium uppercase tracking-widest text-[#6b7280]">
+          GCP Infrastructure Config
+        </label>
         <textarea
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
+          className="font-mono-code mt-2 w-full resize-y rounded-lg border border-[#2a2a3e] bg-[#12121a] px-3 py-3 text-sm text-[#d1d5db] placeholder:text-[#6b7280] focus:border-[#00d4aa] focus:outline-none focus:ring-[3px] focus:ring-[rgba(0,212,170,0.1)]"
           placeholder="Paste your GCP Terraform or YAML config here..."
           value={terraform}
-          onChange={(e) => setTerraform(e.target.value)}
-          rows={12}
+          onChange={(e) => onTerraformChange(e.target.value)}
+          rows={14}
+          spellCheck={false}
         />
-      </label>
-      <div className="flex flex-wrap items-center gap-4">
-        <label className="text-sm font-medium text-slate-700">
-          Billing CSV (optional)
+      </div>
+
+      <div>
+        <p className="text-[11px] font-medium uppercase tracking-widest text-[#6b7280]">
+          Billing export (CSV)
+        </p>
+        <div
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && document.getElementById("billing-input")?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          className={`mt-2 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-10 transition-colors ${
+            dragOver
+              ? "border-[#00d4aa] bg-[rgba(0,212,170,0.06)]"
+              : "border-[#2a2a3e] bg-[#12121a] hover:border-[#3a3a5e]"
+          }`}
+          onClick={() => document.getElementById("billing-input")?.click()}
+        >
+          <span className="text-2xl" aria-hidden>
+            📂
+          </span>
+          <p className="mt-2 text-center text-sm text-[#d1d5db]">
+            Drop billing CSV or browse — GCP billing export (12 months)
+          </p>
+          {billingFile && (
+            <p className="mt-2 text-xs text-[#00d4aa]">{billingFile.name}</p>
+          )}
           <input
+            id="billing-input"
             type="file"
             accept=".csv"
-            className="mt-1 block text-sm text-slate-600"
-            onChange={(e) => setBillingFile(e.target.files?.[0] ?? null)}
+            className="hidden"
+            onChange={(e) => onBillingFileChange(e.target.files?.[0] ?? null)}
           />
-        </label>
-        <div className="ml-auto flex gap-2">
-          {onTrySample && (
-            <button
-              type="button"
-              onClick={() => onTrySample(setTerraform, setBillingFile)}
-              className="rounded-lg border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
-            >
-              Try sample data
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isLoading || !terraform.trim()}
-            className="rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? "Analyzing…" : "Analyze"}
-          </button>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {onTrySample && (
+          <button type="button" className="btn-outline text-sm" onClick={onTrySample}>
+            Try sample data
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn-primary text-sm"
+          onClick={handleSubmit}
+          disabled={isLoading || !terraform.trim()}
+        >
+          {isLoading ? "Analyzing…" : "Analyze infrastructure"}
+        </button>
       </div>
     </div>
   );

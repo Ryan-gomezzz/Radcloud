@@ -1,0 +1,1185 @@
+{
+  "gcp_config_raw": "",
+  "gcp_billing_raw": [],
+  "status": "complete",
+  "errors": [],
+  "gcp_inventory": [
+    {
+      "resource_id": "web-server-1",
+      "resource_type": "compute_instance",
+      "service": "Compute Engine",
+      "name": "web-server-1",
+      "config": {
+        "machine_type": "n1-standard-4",
+        "region": "us-central1",
+        "zone": "us-central1-a",
+        "disk_size_gb": 100,
+        "disk_type": "pd-ssd",
+        "role": "web"
+      }
+    },
+    {
+      "resource_id": "web-server-2",
+      "resource_type": "compute_instance",
+      "service": "Compute Engine",
+      "name": "web-server-2",
+      "config": {
+        "machine_type": "n1-standard-4",
+        "region": "us-central1",
+        "zone": "us-central1-b",
+        "disk_size_gb": 100,
+        "disk_type": "pd-ssd",
+        "role": "web"
+      }
+    },
+    {
+      "resource_id": "payment-worker-1",
+      "resource_type": "compute_instance",
+      "service": "Compute Engine",
+      "name": "payment-worker-1",
+      "config": {
+        "machine_type": "n1-highcpu-8",
+        "region": "us-central1",
+        "zone": "us-central1-a",
+        "disk_size_gb": 200,
+        "disk_type": "pd-ssd",
+        "role": "batch"
+      }
+    },
+    {
+      "resource_id": "novapay-primary-db",
+      "resource_type": "cloud_sql",
+      "service": "Cloud SQL",
+      "name": "novapay-primary-db",
+      "config": {
+        "database_version": "POSTGRES_14",
+        "tier": "db-n1-standard-4",
+        "region": "us-central1",
+        "disk_size_gb": 500,
+        "availability_type": "REGIONAL"
+      }
+    },
+    {
+      "resource_id": "novapay-replica-db",
+      "resource_type": "cloud_sql",
+      "service": "Cloud SQL",
+      "name": "novapay-replica-db",
+      "config": {
+        "database_version": "POSTGRES_14",
+        "tier": "db-n1-standard-2",
+        "region": "us-central1",
+        "disk_size_gb": 500,
+        "availability_type": "ZONAL",
+        "replica_of": "novapay-primary-db"
+      }
+    },
+    {
+      "resource_id": "novapay-redis",
+      "resource_type": "memorystore_redis",
+      "service": "Memorystore",
+      "name": "novapay-redis",
+      "config": {
+        "tier": "STANDARD_HA",
+        "memory_size_gb": 5,
+        "region": "us-central1",
+        "redis_version": "REDIS_6_X"
+      }
+    },
+    {
+      "resource_id": "novapay-assets",
+      "resource_type": "gcs_bucket",
+      "service": "Cloud Storage",
+      "name": "novapay-assets-prod",
+      "config": {
+        "location": "US",
+        "storage_class": "STANDARD",
+        "versioning": true
+      }
+    },
+    {
+      "resource_id": "novapay-logs",
+      "resource_type": "gcs_bucket",
+      "service": "Cloud Storage",
+      "name": "novapay-logs-archive",
+      "config": {
+        "location": "US",
+        "storage_class": "NEARLINE",
+        "lifecycle_days": 90
+      }
+    },
+    {
+      "resource_id": "novapay-backups",
+      "resource_type": "gcs_bucket",
+      "service": "Cloud Storage",
+      "name": "novapay-db-backups",
+      "config": {
+        "location": "US",
+        "storage_class": "COLDLINE",
+        "versioning": true
+      }
+    },
+    {
+      "resource_id": "novapay-api",
+      "resource_type": "cloud_run",
+      "service": "Cloud Run",
+      "name": "novapay-api",
+      "config": {
+        "region": "us-central1",
+        "cpu": "2",
+        "memory": "2Gi",
+        "min_instances": 1,
+        "max_instances": 20
+      }
+    },
+    {
+      "resource_id": "webhook-ingest-fn",
+      "resource_type": "cloud_function",
+      "service": "Cloud Functions",
+      "name": "webhook-ingest-fn",
+      "config": {
+        "region": "us-central1",
+        "runtime": "python311",
+        "trigger": "http",
+        "memory_mb": 512
+      }
+    },
+    {
+      "resource_id": "settlement-cron-fn",
+      "resource_type": "cloud_function",
+      "service": "Cloud Functions",
+      "name": "settlement-cron-fn",
+      "config": {
+        "region": "us-central1",
+        "runtime": "python311",
+        "trigger": "pubsub",
+        "memory_mb": 1024
+      }
+    },
+    {
+      "resource_id": "payment-events",
+      "resource_type": "pubsub_topic",
+      "service": "Pub/Sub",
+      "name": "payment-events",
+      "config": {
+        "message_retention_duration": "604800s"
+      }
+    },
+    {
+      "resource_id": "payment-events-sub",
+      "resource_type": "pubsub_subscription",
+      "service": "Pub/Sub",
+      "name": "payment-events-sub",
+      "config": {
+        "topic": "payment-events",
+        "ack_deadline_seconds": 60,
+        "push_endpoint": null
+      }
+    },
+    {
+      "resource_id": "novapay_analytics",
+      "resource_type": "bigquery_dataset",
+      "service": "BigQuery",
+      "name": "novapay_analytics",
+      "config": {
+        "location": "US",
+        "default_table_expiration_ms": null
+      }
+    },
+    {
+      "resource_id": "transactions_curated",
+      "resource_type": "bigquery_table",
+      "service": "BigQuery",
+      "name": "transactions_curated",
+      "config": {
+        "dataset_id": "novapay_analytics",
+        "partitioning": "DAY"
+      }
+    },
+    {
+      "resource_id": "novapay-vpc",
+      "resource_type": "vpc_network",
+      "service": "VPC",
+      "name": "novapay-vpc",
+      "config": {
+        "auto_create_subnetworks": false,
+        "routing_mode": "REGIONAL"
+      }
+    },
+    {
+      "resource_id": "private-app-subnet",
+      "resource_type": "vpc_subnet",
+      "service": "VPC",
+      "name": "private-app-subnet",
+      "config": {
+        "ip_cidr_range": "10.0.1.0/24",
+        "region": "us-central1",
+        "private_ip_google_access": true
+      }
+    },
+    {
+      "resource_id": "private-db-subnet",
+      "resource_type": "vpc_subnet",
+      "service": "VPC",
+      "name": "private-db-subnet",
+      "config": {
+        "ip_cidr_range": "10.0.2.0/24",
+        "region": "us-central1",
+        "private_ip_google_access": true
+      }
+    },
+    {
+      "resource_id": "fw-allow-internal",
+      "resource_type": "firewall_rule",
+      "service": "VPC Firewall",
+      "name": "fw-allow-internal",
+      "config": {
+        "direction": "INGRESS",
+        "ports": [
+          "tcp:0-65535"
+        ],
+        "source_ranges": [
+          "10.0.0.0/16"
+        ]
+      }
+    },
+    {
+      "resource_id": "fw-allow-https",
+      "resource_type": "firewall_rule",
+      "service": "VPC Firewall",
+      "name": "fw-allow-https",
+      "config": {
+        "direction": "INGRESS",
+        "ports": [
+          "tcp:443"
+        ],
+        "source_ranges": [
+          "0.0.0.0/0"
+        ],
+        "target_tags": [
+          "web"
+        ]
+      }
+    },
+    {
+      "resource_id": "fw-deny-all-egress-default",
+      "resource_type": "firewall_rule",
+      "service": "VPC Firewall",
+      "name": "fw-restrict-egress-db",
+      "config": {
+        "direction": "EGRESS",
+        "deny": true,
+        "target_tags": [
+          "db"
+        ]
+      }
+    },
+    {
+      "resource_id": "sa-api-runtime",
+      "resource_type": "service_account",
+      "service": "IAM",
+      "name": "sa-api-runtime",
+      "config": {
+        "account_id": "novapay-api-runtime",
+        "display_name": "NovaPay API Runtime"
+      }
+    },
+    {
+      "resource_id": "sa-batch-worker",
+      "resource_type": "service_account",
+      "service": "IAM",
+      "name": "sa-batch-worker",
+      "config": {
+        "account_id": "novapay-batch",
+        "display_name": "NovaPay Batch Worker"
+      }
+    },
+    {
+      "resource_id": "iam-cloudsql-client",
+      "resource_type": "iam_binding",
+      "service": "IAM",
+      "name": "project_iam_cloudsql_client",
+      "config": {
+        "role": "roles/cloudsql.client",
+        "members": [
+          "serviceAccount:novapay-api-runtime@*.iam.gserviceaccount.com"
+        ]
+      }
+    }
+  ],
+  "aws_mapping": [
+    {
+      "gcp_resource_id": "web-server-1",
+      "gcp_service": "Compute Engine",
+      "gcp_type": "compute_instance",
+      "gcp_config_summary": "machine_type=n1-standard-4, region=us-central1, zone=us-central1-a, disk_size_gb=100, disk_type=pd-ssd, role=web",
+      "aws_service": "EC2",
+      "aws_type": "instance",
+      "aws_config": {
+        "instance_type": "m5.xlarge",
+        "region": "us-east-1",
+        "ebs_size_gb": 100,
+        "ebs_type": "gp3"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "web-server-2",
+      "gcp_service": "Compute Engine",
+      "gcp_type": "compute_instance",
+      "gcp_config_summary": "machine_type=n1-standard-4, region=us-central1, zone=us-central1-b, disk_size_gb=100, disk_type=pd-ssd, role=web",
+      "aws_service": "EC2",
+      "aws_type": "instance",
+      "aws_config": {
+        "instance_type": "m5.xlarge",
+        "region": "us-east-1",
+        "ebs_size_gb": 100,
+        "ebs_type": "gp3"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "payment-worker-1",
+      "gcp_service": "Compute Engine",
+      "gcp_type": "compute_instance",
+      "gcp_config_summary": "machine_type=n1-highcpu-8, region=us-central1, zone=us-central1-a, disk_size_gb=200, disk_type=pd-ssd, role=batch",
+      "aws_service": "EC2",
+      "aws_type": "instance",
+      "aws_config": {
+        "instance_type": "c5.2xlarge",
+        "region": "us-east-1",
+        "ebs_size_gb": 200,
+        "ebs_type": "gp3"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-primary-db",
+      "gcp_service": "Cloud SQL",
+      "gcp_type": "cloud_sql",
+      "gcp_config_summary": "database_version=POSTGRES_14, tier=db-n1-standard-4, region=us-central1, disk_size_gb=500, availability_type=REGIONAL",
+      "aws_service": "RDS",
+      "aws_type": "db_instance",
+      "aws_config": {
+        "instance_class": "db.m5.xlarge",
+        "region": "us-east-1",
+        "engine": "postgres",
+        "multi_az": true
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-replica-db",
+      "gcp_service": "Cloud SQL",
+      "gcp_type": "cloud_sql",
+      "gcp_config_summary": "database_version=POSTGRES_14, tier=db-n1-standard-2, region=us-central1, disk_size_gb=500, availability_type=ZONAL, repl",
+      "aws_service": "RDS",
+      "aws_type": "db_instance",
+      "aws_config": {
+        "instance_class": "db.m5.large",
+        "region": "us-east-1",
+        "engine": "postgres",
+        "multi_az": false
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-redis",
+      "gcp_service": "Memorystore",
+      "gcp_type": "memorystore_redis",
+      "gcp_config_summary": "tier=STANDARD_HA, memory_size_gb=5, region=us-central1, redis_version=REDIS_6_X",
+      "aws_service": "ElastiCache",
+      "aws_type": "redis_cluster",
+      "aws_config": {
+        "node_type": "cache.r6g.large",
+        "region": "us-east-1",
+        "num_nodes": 2
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-assets",
+      "gcp_service": "Cloud Storage",
+      "gcp_type": "gcs_bucket",
+      "gcp_config_summary": "location=US, storage_class=STANDARD, versioning=True",
+      "aws_service": "S3",
+      "aws_type": "bucket",
+      "aws_config": {
+        "storage_class": "STANDARD",
+        "region": "us-east-1",
+        "versioning": true
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-logs",
+      "gcp_service": "Cloud Storage",
+      "gcp_type": "gcs_bucket",
+      "gcp_config_summary": "location=US, storage_class=NEARLINE, lifecycle_days=90",
+      "aws_service": "S3",
+      "aws_type": "bucket",
+      "aws_config": {
+        "storage_class": "STANDARD_IA",
+        "region": "us-east-1",
+        "versioning": false
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-backups",
+      "gcp_service": "Cloud Storage",
+      "gcp_type": "gcs_bucket",
+      "gcp_config_summary": "location=US, storage_class=COLDLINE, versioning=True",
+      "aws_service": "S3",
+      "aws_type": "bucket",
+      "aws_config": {
+        "storage_class": "STANDARD",
+        "region": "us-east-1",
+        "versioning": true
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-api",
+      "gcp_service": "Cloud Run",
+      "gcp_type": "cloud_run",
+      "gcp_config_summary": "region=us-central1, cpu=2, memory=2Gi, min_instances=1, max_instances=20",
+      "aws_service": "ECS Fargate",
+      "aws_type": "service",
+      "aws_config": {
+        "cpu": "1024",
+        "memory": "2048",
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "webhook-ingest-fn",
+      "gcp_service": "Cloud Functions",
+      "gcp_type": "cloud_function",
+      "gcp_config_summary": "region=us-central1, runtime=python311, trigger=http, memory_mb=512",
+      "aws_service": "Lambda",
+      "aws_type": "function",
+      "aws_config": {
+        "memory_mb": 512,
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "settlement-cron-fn",
+      "gcp_service": "Cloud Functions",
+      "gcp_type": "cloud_function",
+      "gcp_config_summary": "region=us-central1, runtime=python311, trigger=pubsub, memory_mb=1024",
+      "aws_service": "Lambda",
+      "aws_type": "function",
+      "aws_config": {
+        "memory_mb": 1024,
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "payment-events",
+      "gcp_service": "Pub/Sub",
+      "gcp_type": "pubsub_topic",
+      "gcp_config_summary": "message_retention_duration=604800s",
+      "aws_service": "SNS",
+      "aws_type": "topic",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "payment-events-sub",
+      "gcp_service": "Pub/Sub",
+      "gcp_type": "pubsub_subscription",
+      "gcp_config_summary": "topic=payment-events, ack_deadline_seconds=60, push_endpoint=None",
+      "aws_service": "SQS",
+      "aws_type": "queue",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "BigQuery streaming subscription patterns may require Kinesis Firehose + S3 + Athena."
+    },
+    {
+      "gcp_resource_id": "novapay_analytics",
+      "gcp_service": "BigQuery",
+      "gcp_type": "bigquery_dataset",
+      "gcp_config_summary": "location=US, default_table_expiration_ms=None",
+      "aws_service": "Athena",
+      "aws_type": "workgroup",
+      "aws_config": {
+        "region": "us-east-1",
+        "output_location": "s3://novapay-athena-results/"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "Dataset-level ACLs and analytics semantics differ; evaluate Redshift Serverless for BI."
+    },
+    {
+      "gcp_resource_id": "transactions_curated",
+      "gcp_service": "BigQuery",
+      "gcp_type": "bigquery_table",
+      "gcp_config_summary": "dataset_id=novapay_analytics, partitioning=DAY",
+      "aws_service": "Glue Data Catalog",
+      "aws_type": "table",
+      "aws_config": {
+        "format": "parquet",
+        "partitioning": "DAY"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "novapay-vpc",
+      "gcp_service": "VPC",
+      "gcp_type": "vpc_network",
+      "gcp_config_summary": "auto_create_subnetworks=False, routing_mode=REGIONAL",
+      "aws_service": "VPC",
+      "aws_type": "vpc",
+      "aws_config": {
+        "cidr": "10.0.0.0/16",
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "private-app-subnet",
+      "gcp_service": "VPC",
+      "gcp_type": "vpc_subnet",
+      "gcp_config_summary": "ip_cidr_range=10.0.1.0/24, region=us-central1, private_ip_google_access=True",
+      "aws_service": "VPC",
+      "aws_type": "subnet",
+      "aws_config": {
+        "region": "us-east-1",
+        "map_public_ip": false
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "private-db-subnet",
+      "gcp_service": "VPC",
+      "gcp_type": "vpc_subnet",
+      "gcp_config_summary": "ip_cidr_range=10.0.2.0/24, region=us-central1, private_ip_google_access=True",
+      "aws_service": "VPC",
+      "aws_type": "subnet",
+      "aws_config": {
+        "region": "us-east-1",
+        "map_public_ip": false
+      },
+      "mapping_confidence": "direct",
+      "gap_flag": false,
+      "gap_notes": null
+    },
+    {
+      "gcp_resource_id": "fw-allow-internal",
+      "gcp_service": "VPC Firewall",
+      "gcp_type": "firewall_rule",
+      "gcp_config_summary": "direction=INGRESS, ports=['tcp:0-65535'], source_ranges=['10.0.0.0/16']",
+      "aws_service": "VPC",
+      "aws_type": "security_group_rule",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "GCP network-level firewall with tags \u2192 AWS SG + NACL redesign required."
+    },
+    {
+      "gcp_resource_id": "fw-allow-https",
+      "gcp_service": "VPC Firewall",
+      "gcp_type": "firewall_rule",
+      "gcp_config_summary": "direction=INGRESS, ports=['tcp:443'], source_ranges=['0.0.0.0/0'], target_tags=['web']",
+      "aws_service": "VPC",
+      "aws_type": "security_group_rule",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "GCP network-level firewall with tags \u2192 AWS SG + NACL redesign required."
+    },
+    {
+      "gcp_resource_id": "fw-deny-all-egress-default",
+      "gcp_service": "VPC Firewall",
+      "gcp_type": "firewall_rule",
+      "gcp_config_summary": "direction=EGRESS, deny=True, target_tags=['db']",
+      "aws_service": "VPC",
+      "aws_type": "security_group_rule",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "GCP network-level firewall with tags \u2192 AWS SG + NACL redesign required."
+    },
+    {
+      "gcp_resource_id": "sa-api-runtime",
+      "gcp_service": "IAM",
+      "gcp_type": "service_account",
+      "gcp_config_summary": "account_id=novapay-api-runtime, display_name=NovaPay API Runtime",
+      "aws_service": "IAM",
+      "aws_type": "role",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "GCP SA keys vs AWS IAM roles; workload identity patterns differ."
+    },
+    {
+      "gcp_resource_id": "sa-batch-worker",
+      "gcp_service": "IAM",
+      "gcp_type": "service_account",
+      "gcp_config_summary": "account_id=novapay-batch, display_name=NovaPay Batch Worker",
+      "aws_service": "IAM",
+      "aws_type": "role",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "GCP SA keys vs AWS IAM roles; workload identity patterns differ."
+    },
+    {
+      "gcp_resource_id": "iam-cloudsql-client",
+      "gcp_service": "IAM",
+      "gcp_type": "iam_binding",
+      "gcp_config_summary": "role=roles/cloudsql.client, members=['serviceAccount:novapay-api-runtime@*.iam.gserviceaccount.com']",
+      "aws_service": "IAM",
+      "aws_type": "policy_attachment",
+      "aws_config": {
+        "region": "us-east-1"
+      },
+      "mapping_confidence": "partial",
+      "gap_flag": true,
+      "gap_notes": "Project-level bindings must map to account-scoped IAM policies."
+    }
+  ],
+  "aws_architecture": {
+    "summary": "NovaPay's target AWS architecture lands in a single production VPC in us-east-1 with three isolated tiers: public edge (ALB only), private application subnets for EC2 web and ECS Fargate API workloads, and private database subnets for Multi-AZ RDS PostgreSQL. ElastiCache Redis replaces Memorystore for session and rate-limit data. GCS maps to versioned S3 buckets with lifecycle policies mirroring Nearline/Coldline economics. Cloud Run becomes an ECS Fargate service behind an internal ALB; Cloud Functions become Lambda with EventBridge and SQS triggers. Pub/Sub maps to SNS topics fanning into SQS queues; BigQuery analytics land on Athena + S3 curated data lake with optional Redshift Serverless for heavy aggregation. Firewall tag semantics are rebuilt as security groups and NACLs with explicit least-privilege paths between web, API, and data tiers.",
+    "services_used": [
+      "EC2",
+      "RDS",
+      "ElastiCache",
+      "S3",
+      "ECS",
+      "Lambda",
+      "SNS",
+      "SQS",
+      "Athena",
+      "Glue",
+      "VPC",
+      "IAM"
+    ],
+    "networking": {
+      "vpc_count": 1,
+      "subnet_strategy": "public + private per AZ",
+      "security_groups": [
+        "web-sg",
+        "api-sg",
+        "db-sg",
+        "lambda-sg"
+      ]
+    },
+    "total_resources": 30,
+    "direct_mappings": 24,
+    "partial_mappings": 4,
+    "no_equivalent": 2
+  },
+  "risks": [
+    {
+      "id": "RISK-001",
+      "category": "service_compatibility",
+      "severity": "high",
+      "title": "BigQuery Pub/Sub subscription has no direct AWS equivalent",
+      "description": "Direct Pub/Sub-to-BigQuery streaming ingestion does not exist as a single AWS primitive; NovaPay's payment-events analytics path needs redesign.",
+      "affected_resources": [
+        "payment-events-sub",
+        "transactions_curated"
+      ],
+      "aws_alternative": "Kinesis Data Firehose \u2192 S3 \u2192 Athena",
+      "migration_impact": "Requires rearchitecting the analytics pipeline and validation of SLAs.",
+      "mitigation": "Build Kinesis-based ingestion with idempotent writers; replay from GCS export during cutover.",
+      "estimated_effort_days": 15
+    },
+    {
+      "id": "RISK-002",
+      "category": "data_migration",
+      "severity": "high",
+      "title": "Database migration requires zero-downtime cutover",
+      "description": "REGIONAL Cloud SQL with active replica must cut over to Multi-AZ RDS without prolonged read-only windows.",
+      "affected_resources": [
+        "novapay-primary-db",
+        "novapay-replica-db"
+      ],
+      "aws_alternative": "RDS PostgreSQL with DMS continuous replication",
+      "migration_impact": "High \u2014 core ledger availability risk during switch.",
+      "mitigation": "Use DMS full load + CDC; rehearse failover twice; maintain GCP fallback DNS.",
+      "estimated_effort_days": 12
+    },
+    {
+      "id": "RISK-003",
+      "category": "security_compliance",
+      "severity": "medium",
+      "title": "IAM binding sprawl vs AWS least-privilege",
+      "description": "Project-level IAM bindings and service accounts do not map 1:1 to AWS IAM roles and SCPs.",
+      "affected_resources": [
+        "iam-cloudsql-client",
+        "sa-api-runtime",
+        "sa-batch-worker"
+      ],
+      "aws_alternative": "IAM roles per workload + permission boundaries",
+      "migration_impact": "Audit cycle required for SOC2 evidence.",
+      "mitigation": "Generate IAM policy matrix from GCP bindings; automate drift checks with IAM Access Analyzer.",
+      "estimated_effort_days": 8
+    },
+    {
+      "id": "RISK-004",
+      "category": "networking",
+      "severity": "medium",
+      "title": "Firewall tag model vs security groups",
+      "description": "GCP firewall rules reference network tags; EC2 must use consistent SG attachments across ASGs.",
+      "affected_resources": [
+        "fw-allow-https",
+        "fw-allow-internal",
+        "web-server-1",
+        "web-server-2"
+      ],
+      "aws_alternative": "Layered security groups + subnet NACLs",
+      "migration_impact": "Misconfiguration could expose payment APIs.",
+      "mitigation": "Automate SG generation from rule matrix; penetration test before go-live.",
+      "estimated_effort_days": 6
+    },
+    {
+      "id": "RISK-005",
+      "category": "cost",
+      "severity": "medium",
+      "title": "Egress and inter-AZ data transfer",
+      "description": "NovaPay's cross-tier chatter may spike AWS data transfer versus GCP internal routing assumptions.",
+      "affected_resources": [
+        "novapay-api",
+        "payment-worker-1"
+      ],
+      "aws_alternative": "VPC endpoints, PrivateLink, placement groups",
+      "migration_impact": "Potential +5\u201312% run-rate if not architected.",
+      "mitigation": "Model AZ affinity; use S3/Gateway endpoints; right-size NAT.",
+      "estimated_effort_days": 4
+    },
+    {
+      "id": "RISK-006",
+      "category": "operational",
+      "severity": "low",
+      "title": "Cloud Functions runtime parity",
+      "description": "Python 3.11 on GCF vs Lambda packaging and cold start profiles differ.",
+      "affected_resources": [
+        "webhook-ingest-fn",
+        "settlement-cron-fn"
+      ],
+      "aws_alternative": "Lambda + EventBridge schedule + SQS trigger",
+      "migration_impact": "Low \u2014 mostly CI/CD and observability wiring.",
+      "mitigation": "Use Lambda Powertools; align structured logging to CloudWatch.",
+      "estimated_effort_days": 3
+    },
+    {
+      "id": "RISK-007",
+      "category": "resilience",
+      "severity": "low",
+      "title": "Redis failover semantics",
+      "description": "Memorystore STANDARD_HA vs ElastiCache Multi-AZ failover timing differs.",
+      "affected_resources": [
+        "novapay-redis"
+      ],
+      "aws_alternative": "ElastiCache Redis cluster mode disabled with replica",
+      "migration_impact": "Brief cache stampede possible on failover.",
+      "mitigation": "Tune TTLs; add circuit breakers in API tier.",
+      "estimated_effort_days": 2
+    },
+    {
+      "id": "RISK-008",
+      "category": "compliance",
+      "severity": "medium",
+      "title": "Object storage residency and encryption",
+      "description": "Multi-region US buckets must map to explicit S3 buckets with KMS CMKs and lifecycle locks.",
+      "affected_resources": [
+        "novapay-assets",
+        "novapay-logs",
+        "novapay-backups"
+      ],
+      "aws_alternative": "S3 + KMS + Object Lock (where required)",
+      "migration_impact": "Medium \u2014 key rotation and audit trails.",
+      "mitigation": "Use bucket policies mirroring GCS IAM; enable S3 Inventory and Macie.",
+      "estimated_effort_days": 5
+    }
+  ],
+  "risk_summary": {
+    "total_risks": 8,
+    "high": 2,
+    "medium": 4,
+    "low": 2,
+    "top_risk": "Database migration requires zero-downtime cutover",
+    "overall_assessment": "Migration is feasible with moderate risk."
+  },
+  "finops": {
+    "gcp_monthly_total": 9840.0,
+    "aws_monthly_ondemand": 10320.0,
+    "aws_monthly_optimized": 6387.0,
+    "total_monthly_savings": 3933.0,
+    "total_first_year_savings": 47200.0,
+    "savings_vs_observation_window": 11800.0,
+    "ri_recommendations": [
+      {
+        "aws_service": "EC2",
+        "instance_type": "m5.xlarge",
+        "quantity": 2,
+        "term": "1-year",
+        "payment_option": "All Upfront",
+        "monthly_ondemand_cost": 280.32,
+        "monthly_ri_cost": 168.0,
+        "monthly_savings": 112.32,
+        "annual_savings": 1347.84,
+        "rationale": "2 instances running 24/7 with >90% utilization."
+      },
+      {
+        "aws_service": "RDS",
+        "instance_type": "db.m5.xlarge",
+        "quantity": 1,
+        "term": "1-year",
+        "payment_option": "Partial Upfront",
+        "monthly_ondemand_cost": 410.0,
+        "monthly_ri_cost": 260.0,
+        "monthly_savings": 150.0,
+        "annual_savings": 1800.0,
+        "rationale": "Primary PostgreSQL always-on; align with Multi-AZ production profile."
+      }
+    ],
+    "cost_comparison": [
+      {
+        "month": "2024-01",
+        "gcp_cost": 9200,
+        "aws_ondemand": 9660,
+        "aws_optimized": 6280
+      },
+      {
+        "month": "2024-02",
+        "gcp_cost": 9450,
+        "aws_ondemand": 9920,
+        "aws_optimized": 6310
+      },
+      {
+        "month": "2024-03",
+        "gcp_cost": 9600,
+        "aws_ondemand": 10080,
+        "aws_optimized": 6350
+      },
+      {
+        "month": "2024-04",
+        "gcp_cost": 9780,
+        "aws_ondemand": 10250,
+        "aws_optimized": 6370
+      },
+      {
+        "month": "2024-05",
+        "gcp_cost": 9900,
+        "aws_ondemand": 10380,
+        "aws_optimized": 6390
+      },
+      {
+        "month": "2024-06",
+        "gcp_cost": 9840,
+        "aws_ondemand": 10320,
+        "aws_optimized": 6387
+      },
+      {
+        "month": "2024-07",
+        "gcp_cost": 10100,
+        "aws_ondemand": 10590,
+        "aws_optimized": 6420
+      },
+      {
+        "month": "2024-08",
+        "gcp_cost": 9950,
+        "aws_ondemand": 10440,
+        "aws_optimized": 6400
+      },
+      {
+        "month": "2024-09",
+        "gcp_cost": 9700,
+        "aws_ondemand": 10180,
+        "aws_optimized": 6360
+      },
+      {
+        "month": "2024-10",
+        "gcp_cost": 9580,
+        "aws_ondemand": 10050,
+        "aws_optimized": 6340
+      },
+      {
+        "month": "2024-11",
+        "gcp_cost": 9720,
+        "aws_ondemand": 10200,
+        "aws_optimized": 6365
+      },
+      {
+        "month": "2024-12",
+        "gcp_cost": 9840,
+        "aws_ondemand": 10320,
+        "aws_optimized": 6387
+      }
+    ],
+    "usage_patterns": [
+      {
+        "gcp_service": "Compute Engine",
+        "pattern": "steady_state",
+        "avg_monthly_cost": 3200.0,
+        "recommendation": "reserved_instance",
+        "description": "Runs near-continuously. Ideal for RIs."
+      },
+      {
+        "gcp_service": "Cloud SQL",
+        "pattern": "steady_state",
+        "avg_monthly_cost": 2800.0,
+        "recommendation": "reserved_instance",
+        "description": "Primary and replica always on; purchase RDS RI on baseline."
+      },
+      {
+        "gcp_service": "Cloud Run",
+        "pattern": "bursty",
+        "avg_monthly_cost": 890.0,
+        "recommendation": "savings_plan_compute",
+        "description": "Scale-to-zero capable; blend Fargate SP with min-capacity tuning."
+      }
+    ],
+    "summary": "Your GCP environment costs $9,840/month on average. Lift-and-shift on-demand AWS would be $10,320/month (+4.9%), but RADCloud Day-0 optimization lands at $6,387/month (\u221235.1% vs on-demand AWS, \u221235.1% vs GCP baseline after rightsizing and RIs). First-year savings vs a traditional 90-day FinOps observation path are estimated at $47,200, with $11,800 avoided waste during the observation window alone."
+  },
+  "runbook": {
+    "title": "GCP to AWS Migration Runbook \u2014 NovaPay",
+    "estimated_total_duration": "8-12 weeks",
+    "phases": [
+      {
+        "phase_number": 1,
+        "name": "Pre-Migration",
+        "duration": "1-2 weeks",
+        "steps": [
+          {
+            "step_number": 1,
+            "action": "Set up AWS landing zone with VPC, subnets, and security groups",
+            "responsible": "Cloud Infrastructure Team",
+            "estimated_hours": 16,
+            "dependencies": [],
+            "rollback": "Delete AWS VPC and associated resources",
+            "notes": "Use target architecture from mapping output"
+          },
+          {
+            "step_number": 2,
+            "action": "Establish cross-cloud connectivity (VPN or Cloud Interconnect equivalent)",
+            "responsible": "Network Engineering",
+            "estimated_hours": 24,
+            "dependencies": [
+              1
+            ],
+            "rollback": "Tear down interconnect; revert DNS if cutover not started",
+            "notes": "Validate latency to GCP during pilot"
+          }
+        ]
+      },
+      {
+        "phase_number": 2,
+        "name": "Workload Migration",
+        "duration": "3-5 weeks",
+        "steps": [
+          {
+            "step_number": 1,
+            "action": "Replicate Cloud SQL to RDS with DMS or logical replication",
+            "responsible": "Database Team",
+            "estimated_hours": 40,
+            "dependencies": [],
+            "rollback": "Stop replication; keep GCP primary authoritative",
+            "notes": "Rehearse cutover twice before production"
+          },
+          {
+            "step_number": 2,
+            "action": "Deploy NovaPay API to ECS Fargate; migrate Cloud Run traffic",
+            "responsible": "Platform Team",
+            "estimated_hours": 32,
+            "dependencies": [
+              1
+            ],
+            "rollback": "Route traffic back to Cloud Run via DNS",
+            "notes": "Align autoscaling with FinOps recommendations"
+          }
+        ]
+      }
+    ],
+    "rollback_plan": "Each phase has individual rollback steps; maintain GCP as fallback until validation gates pass.",
+    "success_criteria": [
+      "All services responding on AWS endpoints with <200ms latency",
+      "Data integrity verified by checksum comparison",
+      "Day-0 Reserved Instances purchased and active"
+    ]
+  },
+  "watchdog": {
+    "monthly_aws_spend": 6387.0,
+    "savings_identified": 2924.0,
+    "resources_optimized_pct": 78,
+    "active_agents": 5,
+    "spend_by_service": [
+      {
+        "service": "EC2",
+        "cost": 2950
+      },
+      {
+        "service": "RDS",
+        "cost": 1690
+      },
+      {
+        "service": "S3",
+        "cost": 1280
+      },
+      {
+        "service": "Lambda",
+        "cost": 586
+      }
+    ],
+    "cost_trend": [
+      {
+        "month": "Month 1",
+        "traditional": 10320,
+        "radcloud": 6387
+      },
+      {
+        "month": "Month 2",
+        "traditional": 10150,
+        "radcloud": 6250
+      },
+      {
+        "month": "Month 3",
+        "traditional": 9980,
+        "radcloud": 6100
+      },
+      {
+        "month": "Month 4",
+        "traditional": 8900,
+        "radcloud": 5950
+      },
+      {
+        "month": "Month 5",
+        "traditional": 7200,
+        "radcloud": 5800
+      },
+      {
+        "month": "Month 6",
+        "traditional": 6900,
+        "radcloud": 5650
+      }
+    ],
+    "optimization_opportunities": [
+      {
+        "id": "OPT-001",
+        "impact": "high",
+        "title": "Right-size EC2 instances",
+        "description": "14 instances oversized by >40%",
+        "monthly_savings": 1180,
+        "auto_fix": [
+          "Downsize 9x m5.xlarge \u2192 m5.large",
+          "Switch 3x c5.2xl \u2192 c6g.xl (Graviton)",
+          "Terminate 2x idle dev instances"
+        ],
+        "confidence": 97
+      },
+      {
+        "id": "OPT-002",
+        "impact": "medium",
+        "title": "S3 lifecycle policies",
+        "description": "3.4 TB in expensive storage tiers",
+        "monthly_savings": 520,
+        "auto_fix": [
+          "Move 2.1 TB to S3 Infrequent Access",
+          "Archive 1.1 TB to S3 Glacier",
+          "Enable intelligent tiering on 4 buckets"
+        ],
+        "confidence": 94
+      },
+      {
+        "id": "OPT-003",
+        "impact": "high",
+        "title": "Reserved Instance strategy",
+        "description": "Replace expiring GCP commitments with AWS RIs",
+        "monthly_savings": 1224,
+        "auto_fix": [
+          "Purchase 1yr RI for prod db.r5.xlarge",
+          "Convert 2x staging to db.t3.medium",
+          "Enable Aurora Serverless v2 scaling"
+        ],
+        "confidence": 91
+      }
+    ],
+    "remediation_pipeline": {
+      "detect": "Scans for cost anomalies and waste patterns every 15 minutes",
+      "evaluate": "Risk Agent ensures changes won't impact performance or availability",
+      "apply": "Auto-applies safe changes: scaling, scheduling, RI purchases, tier adjustments",
+      "verify": "Validates health metrics post-change and auto-rolls back if anomalies detected"
+    }
+  },
+  "iac_bundle": {
+    "files": [
+      {
+        "filename": "main.tf",
+        "language": "hcl",
+        "content": "# RADCloud Generated \u2014 AWS Infrastructure\n# Source: NovaPay GCP Migration\n\nterraform {\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.0\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"us-east-1\"\n}\n\n# --- VPC ---\nresource \"aws_vpc\" \"main\" {\n  cidr_block           = \"10.0.0.0/16\"\n  enable_dns_hostnames = true\n  tags = { Name = \"novapay-vpc\" }\n}\n\nresource \"aws_subnet\" \"private_app\" {\n  vpc_id            = aws_vpc.main.id\n  cidr_block        = \"10.0.1.0/24\"\n  availability_zone = \"us-east-1a\"\n  tags = { Name = \"private-app-subnet\" }\n}\n\n# --- EC2 ---\nresource \"aws_instance\" \"web_server_1\" {\n  ami           = \"ami-0c55b159cbfafe1f0\"\n  instance_type = \"m5.xlarge\"\n  subnet_id     = aws_subnet.private_app.id\n  root_block_device {\n    volume_size = 100\n    volume_type = \"gp3\"\n  }\n  tags = { Name = \"web-server-1\", Environment = \"production\" }\n}\n\n# --- RDS ---\nresource \"aws_db_instance\" \"primary\" {\n  identifier        = \"novapay-primary-db\"\n  engine            = \"postgres\"\n  engine_version    = \"14.9\"\n  instance_class    = \"db.m5.xlarge\"\n  allocated_storage = 200\n  storage_type      = \"gp3\"\n  multi_az          = true\n  tags = { Name = \"novapay-primary-db\" }\n}\n"
+      },
+      {
+        "filename": "variables.tf",
+        "language": "hcl",
+        "content": "variable \"aws_region\" {\n  description = \"AWS region for deployment\"\n  type        = string\n  default     = \"us-east-1\"\n}\n\nvariable \"environment\" {\n  description = \"Environment name\"\n  type        = string\n  default     = \"production\"\n}\n"
+      },
+      {
+        "filename": "outputs.tf",
+        "language": "hcl",
+        "content": "output \"vpc_id\" {\n  value = aws_vpc.main.id\n}\n\noutput \"web_server_ip\" {\n  value = aws_instance.web_server_1.public_ip\n}\n\noutput \"db_endpoint\" {\n  value = aws_db_instance.primary.endpoint\n}\n"
+      }
+    ],
+    "assumptions": [
+      "AWS region set to us-east-1 (mapped from GCP us-central1)",
+      "PostgreSQL 14 engine version preserved from Cloud SQL",
+      "Multi-AZ enabled for production database (mapped from REGIONAL availability)",
+      "gp3 EBS volumes used (mapped from pd-ssd)",
+      "Security groups and IAM roles require manual review before deployment"
+    ],
+    "deployment_notes": "Run `terraform init && terraform plan` to validate before applying. Review security groups and IAM roles manually \u2014 auto-generated policies may be overly permissive."
+  }
+}

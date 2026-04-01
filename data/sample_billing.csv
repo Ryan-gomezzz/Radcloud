@@ -1,4 +1,109 @@
-service,sku,usage_amount,cost
-Compute Engine,n1-standard-4,720,120.50
-Cloud SQL,db-n1-standard-2,720,210.00
-Cloud Storage,Standard Storage,5000,12.30
+billing_month,service,sku_description,usage_amount,usage_unit,cost
+2024-01,Compute Engine,N1 Standard Instance,720,hours,3150.20
+2024-01,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2680.40
+2024-01,Cloud Storage,Standard Storage TB-mo,42,GB-mo,180.10
+2024-01,Cloud Run,CPU allocation,480000,CPU-seconds,420.00
+2024-01,Cloud Functions,Invocations + GB-sec,1e+07,requests,210.50
+2024-01,Pub/Sub,Message delivery,8.2e+09,operations,95.00
+2024-01,BigQuery,Analysis TB,18,TB,340.00
+2024-01,Networking,Cloud NAT + egress,1,month,280.00
+2024-01,Memorystore,Redis STANDARD_HA 5GB,720,hours,420.80
+2024-02,Compute Engine,N1 Standard Instance,720,hours,3220.00
+2024-02,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2710.50
+2024-02,Cloud Storage,Standard + Nearline,48,GB-mo,195.00
+2024-02,Cloud Run,CPU allocation,510000,CPU-seconds,445.00
+2024-02,Cloud Functions,Invocations + GB-sec,1.1e+07,requests,225.00
+2024-02,Pub/Sub,Message delivery,8.5e+09,operations,102.00
+2024-02,BigQuery,Analysis TB,19,TB,355.00
+2024-02,Networking,Cloud NAT + egress,1,month,290.00
+2024-02,Memorystore,Redis STANDARD_HA 5GB,720,hours,428.50
+2024-03,Compute Engine,N1 Standard Instance,720,hours,3280.30
+2024-03,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2750.00
+2024-03,Cloud Storage,Standard + Nearline,50,GB-mo,205.00
+2024-03,Cloud Run,CPU allocation,530000,CPU-seconds,460.00
+2024-03,Cloud Functions,Invocations + GB-sec,1.15e+07,requests,232.00
+2024-03,Pub/Sub,Message delivery,8.8e+09,operations,108.00
+2024-03,BigQuery,Analysis TB,20,TB,368.00
+2024-03,Networking,Cloud NAT + egress,1,month,298.70
+2024-03,Memorystore,Redis STANDARD_HA 5GB,720,hours,435.00
+2024-04,Compute Engine,N1 Standard Instance,720,hours,3310.00
+2024-04,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2785.00
+2024-04,Cloud Storage,Standard + Nearline,52,GB-mo,212.00
+2024-04,Cloud Run,CPU allocation,545000,CPU-seconds,472.00
+2024-04,Cloud Functions,Invocations + GB-sec,1.2e+07,requests,238.00
+2024-04,Pub/Sub,Message delivery,9e+09,operations,112.00
+2024-04,BigQuery,Analysis TB,21,TB,378.00
+2024-04,Networking,Cloud NAT + egress,1,month,305.00
+2024-04,Memorystore,Redis STANDARD_HA 5GB,720,hours,440.00
+2024-05,Compute Engine,N1 Standard Instance,720,hours,3345.00
+2024-05,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2810.00
+2024-05,Cloud Storage,Standard + Nearline,54,GB-mo,218.00
+2024-05,Cloud Run,CPU allocation,560000,CPU-seconds,485.00
+2024-05,Cloud Functions,Invocations + GB-sec,1.22e+07,requests,242.00
+2024-05,Pub/Sub,Message delivery,9.2e+09,operations,118.00
+2024-05,BigQuery,Analysis TB,22,TB,388.00
+2024-05,Networking,Cloud NAT + egress,1,month,312.00
+2024-05,Memorystore,Redis STANDARD_HA 5GB,720,hours,445.00
+2024-06,Compute Engine,N1 Standard Instance,720,hours,3360.00
+2024-06,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2825.00
+2024-06,Cloud Storage,Standard + Nearline,55,GB-mo,220.00
+2024-06,Cloud Run,CPU allocation,565000,CPU-seconds,490.00
+2024-06,Cloud Functions,Invocations + GB-sec,1.25e+07,requests,245.00
+2024-06,Pub/Sub,Message delivery,9.3e+09,operations,120.00
+2024-06,BigQuery,Analysis TB,22,TB,390.00
+2024-06,Networking,Cloud NAT + egress,1,month,315.00
+2024-06,Memorystore,Redis STANDARD_HA 5GB,720,hours,448.00
+2024-07,Compute Engine,N1 Standard Instance,720,hours,3420.00
+2024-07,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2860.00
+2024-07,Cloud Storage,Standard + Nearline,56,GB-mo,225.00
+2024-07,Cloud Run,CPU allocation,580000,CPU-seconds,505.00
+2024-07,Cloud Functions,Invocations + GB-sec,1.28e+07,requests,250.00
+2024-07,Pub/Sub,Message delivery,9.5e+09,operations,125.00
+2024-07,BigQuery,Analysis TB,23,TB,400.00
+2024-07,Networking,Cloud NAT + egress,1,month,322.00
+2024-07,Memorystore,Redis STANDARD_HA 5GB,720,hours,455.00
+2024-08,Compute Engine,N1 Standard Instance,720,hours,3380.00
+2024-08,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2835.00
+2024-08,Cloud Storage,Standard + Nearline,55,GB-mo,222.00
+2024-08,Cloud Run,CPU allocation,575000,CPU-seconds,498.00
+2024-08,Cloud Functions,Invocations + GB-sec,1.26e+07,requests,246.00
+2024-08,Pub/Sub,Message delivery,9.4e+09,operations,122.00
+2024-08,BigQuery,Analysis TB,22,TB,392.00
+2024-08,Networking,Cloud NAT + egress,1,month,318.00
+2024-08,Memorystore,Redis STANDARD_HA 5GB,720,hours,450.00
+2024-09,Compute Engine,N1 Standard Instance,720,hours,3300.00
+2024-09,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2790.00
+2024-09,Cloud Storage,Standard + Nearline,53,GB-mo,215.00
+2024-09,Cloud Run,CPU allocation,555000,CPU-seconds,478.00
+2024-09,Cloud Functions,Invocations + GB-sec,1.2e+07,requests,236.00
+2024-09,Pub/Sub,Message delivery,9.1e+09,operations,115.00
+2024-09,BigQuery,Analysis TB,21,TB,382.00
+2024-09,Networking,Cloud NAT + egress,1,month,308.00
+2024-09,Memorystore,Redis STANDARD_HA 5GB,720,hours,442.00
+2024-10,Compute Engine,N1 Standard Instance,720,hours,3260.00
+2024-10,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2765.00
+2024-10,Cloud Storage,Standard + Nearline,52,GB-mo,210.00
+2024-10,Cloud Run,CPU allocation,548000,CPU-seconds,468.00
+2024-10,Cloud Functions,Invocations + GB-sec,1.18e+07,requests,232.00
+2024-10,Pub/Sub,Message delivery,8.9e+09,operations,110.00
+2024-10,BigQuery,Analysis TB,20,TB,375.00
+2024-10,Networking,Cloud NAT + egress,1,month,300.00
+2024-10,Memorystore,Redis STANDARD_HA 5GB,720,hours,438.00
+2024-11,Compute Engine,N1 Standard Instance,720,hours,3290.00
+2024-11,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2780.00
+2024-11,Cloud Storage,Standard + Nearline,53,GB-mo,214.00
+2024-11,Cloud Run,CPU allocation,552000,CPU-seconds,475.00
+2024-11,Cloud Functions,Invocations + GB-sec,1.2e+07,requests,235.00
+2024-11,Pub/Sub,Message delivery,9e+09,operations,114.00
+2024-11,BigQuery,Analysis TB,21,TB,380.00
+2024-11,Networking,Cloud NAT + egress,1,month,306.00
+2024-11,Memorystore,Redis STANDARD_HA 5GB,720,hours,441.00
+2024-12,Compute Engine,N1 Standard Instance,720,hours,3320.00
+2024-12,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2800.00
+2024-12,Cloud Storage,Standard + Nearline,54,GB-mo,217.00
+2024-12,Cloud Run,CPU allocation,558000,CPU-seconds,482.00
+2024-12,Cloud Functions,Invocations + GB-sec,1.21e+07,requests,238.00
+2024-12,Pub/Sub,Message delivery,9.1e+09,operations,116.00
+2024-12,BigQuery,Analysis TB,21,TB,385.00
+2024-12,Networking,Cloud NAT + egress,1,month,310.00
+2024-12,Memorystore,Redis STANDARD_HA 5GB,720,hours,444.00
