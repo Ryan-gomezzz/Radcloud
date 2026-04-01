@@ -13,6 +13,25 @@ You own the user-facing app and the brain that coordinates all agents. If the fr
 
 ---
 
+## Product Parity Requirements
+
+The website describes RADCloud as a full product, not just a pipeline demo. Your plan must therefore ship the following product-level experience:
+
+- The **5 agents shown to users are:** Discovery, Mapping, Risk, FinOps Intel, and **Watchdog**.
+- The **Watchdog agent is the fifth agent in the orchestrator**, and it is responsible for emitting the post-migration outputs:
+  - `runbook`
+  - `watchdog`
+  - `iac_bundle`
+- The frontend must expose all major product surfaces promised in the website:
+  - migration analysis tabs
+  - Day-0 FinOps hero card
+  - Watchdog dashboard / remediation opportunities
+  - generated migration runbook
+  - generated AWS Terraform / IaC output
+- Where live cloud integrations are not ready, the UX must still exist using cached/demo-safe fallbacks. Do not leave these as implicit future ideas.
+
+---
+
 ## Hour-by-Hour Execution Plan
 
 ### Hour 0–1: Kickoff + Schema Alignment
@@ -31,12 +50,22 @@ This hour is shared with the full team. Do not skip it.
   │   │   ├── mapping.py
   │   │   ├── risk.py
   │   │   ├── finops.py
-  │   │   └── runbook.py
+  │   │   └── watchdog.py
   │   └── models.py      # Shared Pydantic schemas
   ├── data/              # Sample terraform + billing CSV
   └── README.md
   ```
 - Agree on the shared context schema with all devs. Push the Pydantic models to `models.py` so everyone imports from the same place.
+- Lock the product output contract in this hour. The backend response must include:
+  - `gcp_inventory`
+  - `aws_mapping`
+  - `aws_architecture`
+  - `risks`
+  - `risk_summary`
+  - `finops`
+  - `runbook`
+  - `watchdog`
+  - `iac_bundle`
 - Agree on the agent interface contract: every agent is an async function with this signature:
   ```python
   async def run(context: dict, claude_client) -> dict:
@@ -99,7 +128,7 @@ async def analyze(
         ("mapping", mapping_agent.run),
         ("risk", risk_agent.run),
         ("finops", finops_agent.run),
-        ("runbook", runbook_agent.run),
+        ("watchdog", watchdog_agent.run),
     ]
 
     for agent_name, agent_fn in pipeline:
@@ -129,7 +158,7 @@ Pass this client to every agent so they can make Claude calls.
 
 **Step 4 — Stub agents for testing**
 
-Write stubs for all 5 agents that return hardcoded sample data. This lets you test the full pipeline without waiting for Dev 2/3/4.
+Write stubs for all 5 agents that return hardcoded sample data. This lets you test the full pipeline without waiting for Dev 2/3/4. The Watchdog stub must return `runbook`, `watchdog`, and `iac_bundle` so the full product shell is visible in the frontend before the real agent exists.
 
 ```python
 # agents/discovery.py (stub)
@@ -197,12 +226,13 @@ npm install -D tailwindcss @tailwindcss/vite
 │  [Analyze button]                           │
 ├─────────────────────────────────────────────┤
 │  STATUS BAR                                 │
-│  Discovery → Mapping → Risk → FinOps →      │
-│  Runbook   (highlight current agent)        │
+│  Discovery → Mapping → Risk → FinOps Intel →│
+│  Watchdog   (highlight current agent)       │
 ├─────────────────────────────────────────────┤
 │  RESULTS PANEL (tabbed)                     │
 │  [Asset Map] [Architecture] [Risks]         │
-│  [FinOps Plan] [Runbook]                    │
+│  [FinOps Plan] [Runbook] [Watchdog]         │
+│  [IaC Output]                               │
 │                                             │
 │  (content of selected tab)                  │
 └─────────────────────────────────────────────┘
@@ -248,7 +278,7 @@ function InputPanel({ onSubmit, isLoading }) {
 Show the 5 agents as a horizontal pipeline. Highlight the current one. Grey out pending ones. Green checkmark for completed ones.
 
 ```jsx
-const AGENTS = ["Discovery", "Mapping", "Risk", "FinOps", "Runbook"];
+const AGENTS = ["Discovery", "Mapping", "Risk", "FinOps Intel", "Watchdog"];
 
 function StatusBar({ currentAgent, completedAgents }) {
   return (
@@ -274,7 +304,7 @@ function StatusBar({ currentAgent, completedAgents }) {
 }
 ```
 
-**Step 5 — Results Panel with 5 tabs**
+**Step 5 — Results Panel with 7 tabs**
 
 Each tab renders the relevant section of the context JSON. Here's what each tab shows:
 
@@ -284,9 +314,19 @@ Each tab renders the relevant section of the context JSON. Here's what each tab 
 | Architecture | `aws_mapping` + `aws_architecture` | Service mapping table + architecture narrative |
 | Risks | `risks` | List of risks with severity badges (red/yellow/green) |
 | FinOps Plan | `finops` | Cost comparison table + RI recommendations + **the headline savings number in large bold text** |
-| Runbook | `runbook` | Ordered list of migration steps |
+| Runbook | `runbook` | Ordered list of migration steps with rollback + ownership |
+| Watchdog | `watchdog` | Dashboard cards, trend charts, optimization opportunities, auto-remediation pipeline |
+| IaC Output | `iac_bundle` | Generated AWS Terraform modules/files, assumptions, deployment notes |
 
 The FinOps tab is the most important visually. The Day-0 savings number should be the most prominent element on the entire page. Think big font, a colored card, impossible to miss.
+
+The Watchdog tab is the second most important. It is what closes the gap between "migration plan" and "operating product." It should visibly show:
+
+- monthly AWS baseline / optimized spend
+- top optimization opportunities
+- anomaly detection status
+- Detect → Evaluate → Apply → Verify remediation pipeline
+- whether auto-remediation is simulated, suggested-only, or executable
 
 ```jsx
 function FinOpsTab({ finops }) {
@@ -337,7 +377,7 @@ const handleAnalyze = async (formData) => {
 
 If you implemented the SSE endpoint, use EventSource to update the status bar in real-time. If not, just show a spinner with a simulated progress bar that cycles through agent names on a timer.
 
-**Deliverable by hour 8:** A working React app that talks to the backend, shows the agent pipeline status, and renders all 5 result tabs from the stub data.
+**Deliverable by hour 8:** A working React app that talks to the backend, shows the agent pipeline status, and renders Asset Map, Architecture, Risks, FinOps, Runbook, Watchdog, and IaC Output from the stub data.
 
 ### Hours 8–12: Integration
 
@@ -345,7 +385,7 @@ This is when the real agents from Dev 2/3/4 replace your stubs.
 
 - Pull each dev's agent code into `backend/agents/`.
 - Replace stub imports with real agent imports.
-- Test the full pipeline: real Terraform input → real Discovery → real Mapping → real Risk → real FinOps → real Runbook → frontend displays real output.
+- Test the full pipeline: real Terraform input → real Discovery → real Mapping → real Risk → real FinOps → real Watchdog → frontend displays real output.
 - Debug integration issues. Common problems:
   - Agent writes to a context key with a different name or structure than the frontend expects → fix the agent or the frontend.
   - Agent takes too long (Claude API call timing out) → add timeout handling, increase timeout.
@@ -361,6 +401,10 @@ This is when the real agents from Dev 2/3/4 replace your stubs.
   - The RADCloud brand: pick a simple color scheme (suggest dark blue + green accents to evoke cloud + money/savings).
   - Add a subtle loading animation while agents run.
   - Make sure the FinOps savings number has maximum visual impact.
+- Make the app look like the product on the website, not a bare internal tool:
+  - Add a concise executive-summary header area that reinforces "Migration-Native FinOps" and "Day-0 optimization".
+  - Make the Watchdog view feel like an operations dashboard, not a plain JSON dump.
+  - Show IaC output in a code-viewer / file-tree style panel so the generated Terraform feels tangible.
 - Error states: show user-friendly messages if an agent fails.
 - Edge cases: what if the user pastes garbage Terraform? Show a validation error. What if the CSV has wrong columns? Show a helpful message.
 - Add a "Try Sample Data" button that pre-fills the inputs with the demo data (from Dev 4). This is a safety net for the live demo.
@@ -372,7 +416,7 @@ This is when the real agents from Dev 2/3/4 replace your stubs.
 - Run the demo end-to-end at least 5 times.
 - Pre-cache the Claude API responses for the sample data: save the full context JSON from a successful run and add a `--demo-mode` flag that returns the cached result instead of calling Claude. This guarantees the demo works even if the API is slow or rate-limited.
 - Time the demo. It should be under 5 minutes.
-- Prepare for questions: "How does the mapping work?", "Where does the pricing data come from?", "How accurate is the cost estimate?"
+- Prepare for questions: "How does the mapping work?", "Where does the pricing data come from?", "How accurate is the cost estimate?", "What exactly does Watchdog do after migration?", "Is this real Terraform or a plan artifact?"
 
 ### Hours 20–24: Buffer
 
@@ -418,6 +462,8 @@ Claude API latency can vary from 2–15 seconds per call. With 5 agents each mak
 | `frontend/src/components/tabs/RisksTab.jsx` | Risk report |
 | `frontend/src/components/tabs/FinOpsTab.jsx` | Cost comparison + Day-0 savings |
 | `frontend/src/components/tabs/RunbookTab.jsx` | Migration runbook |
+| `frontend/src/components/tabs/WatchdogTab.jsx` | Post-migration optimization dashboard |
+| `frontend/src/components/tabs/IaCOutputTab.jsx` | Generated AWS Terraform / IaC bundle viewer |
 
 ---
 
@@ -429,10 +475,12 @@ Use this when wiring in real agents at hour 8:
 - [ ] Mapping agent reads `gcp_inventory` and writes `aws_mapping` + `aws_architecture`
 - [ ] Risk agent reads `aws_mapping` and writes `risks` as a list with `category`, `severity`, `description`, `mitigation`
 - [ ] FinOps agent reads `gcp_billing_raw` + `aws_mapping` and writes `finops` with `total_first_year_savings`, `ri_recommendations`, `cost_comparison`, `summary`
-- [ ] Runbook agent reads all prior context and writes `runbook` as ordered steps
+- [ ] Watchdog agent reads all prior context and writes `runbook`, `watchdog`, and `iac_bundle`
 - [ ] Frontend renders every field without crashing on null/undefined
 - [ ] Error in one agent doesn't crash the pipeline
 - [ ] "Try Sample Data" button works with cached output
+- [ ] Watchdog tab clearly communicates whether remediation actions are simulated or executable
+- [ ] IaC tab renders generated files / code blocks without layout breakage
 
 ---
 
@@ -440,6 +488,8 @@ Use this when wiring in real agents at hour 8:
 
 1. **Cut SSE streaming** — just use a simple POST with a loading spinner. Simulate the agent steps with a timer.
 2. **Cut edge case validation** — if the demo data works, that's enough. Don't spend hours handling malformed input.
-3. **Cut the Runbook tab** — it's the least visually impactful. Show a placeholder "Runbook generation coming soon."
-4. **Never cut the FinOps tab** — this is the entire demo. If you can only show one tab, show this one.
-5. **Never cut the "Try Sample Data" button** — this is your demo insurance policy.
+3. **Cut live cloud adapters in the UI** — if needed, render cached data while preserving the Watchdog/IaC surfaces and their schemas.
+4. **Cut Watchdog chart polish, not the Watchdog tab itself** — static cards are acceptable; the product surface must still exist.
+5. **Never cut the FinOps tab** — this is the entire demo.
+6. **Never cut the Watchdog + IaC surfaces** — these are the features that align the app with the product website.
+7. **Never cut the "Try Sample Data" button** — this is your demo insurance policy.

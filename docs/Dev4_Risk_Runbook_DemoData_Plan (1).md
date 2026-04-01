@@ -1,17 +1,29 @@
-# Dev 4 — Risk Agent + Runbook Generator + Demo Data: Master Implementation Plan
+# Dev 4 — Risk Agent + Watchdog / Runbook / IaC + Demo Data: Master Implementation Plan
 
 **Project:** RADCloud  
-**Role:** Risk Agent, Runbook Generator, Demo Data Architect  
+**Role:** Risk Agent, Watchdog Agent, Runbook + IaC Generator, Demo Data Architect  
 **Time Budget:** 24 hours  
 **Stack:** Python, Claude API (claude-sonnet-4-20250514)  
 **Dependencies inbound:** `gcp_inventory` and `aws_mapping` from Dev 2 (available after hour 8). You can build risk templates and the runbook structure independently before then.  
-**Dependencies outbound:** Dev 1 (Frontend) renders your risk report and runbook tabs. Dev 3 (FinOps) uses your sample billing CSV. Everyone uses your sample Terraform for the demo.
+**Dependencies outbound:** Dev 1 (Frontend) renders your risk report, runbook, watchdog, and IaC tabs. Dev 3 (FinOps) uses your sample billing CSV. Everyone uses your sample Terraform for the demo.
 
 ---
 
 ## Your Responsibility in One Line
 
-You make the migration plan credible and you own the demo data. The Risk Agent tells organizations what will go wrong. The Runbook tells them how to do it safely. And the sample data you create is what the judges will actually see — bad sample data kills the entire demo.
+You make the migration plan credible and you own the demo data. The Risk Agent tells organizations what will go wrong. The Watchdog layer tells them what happens after migration. The Runbook and IaC outputs tell them how to execute safely. And the sample data you create is what the judges will actually see — bad sample data kills the entire demo.
+
+---
+
+## Product Parity Requirements
+
+The website's fifth agent is **Watchdog**, not a generic "runbook" step. In this plan, Watchdog is the final agent that emits:
+
+- `runbook`
+- `watchdog`
+- `iac_bundle`
+
+This is how the product closes the loop from assessment to execution to post-migration optimization. If these outputs are missing, the product does not match the website story.
 
 ---
 
@@ -19,12 +31,14 @@ You make the migration plan credible and you own the demo data. The Risk Agent t
 
 | Output | Context key | Who consumes it |
 |--------|------------|-----------------|
-| Risk report | `risks` | Frontend Risks tab, Runbook Agent |
+| Risk report | `risks` | Frontend Risks tab, Watchdog Agent |
 | Migration runbook | `runbook` | Frontend Runbook tab |
+| Watchdog dashboard payload | `watchdog` | Frontend Watchdog tab |
+| Generated AWS Terraform / IaC bundle | `iac_bundle` | Frontend IaC Output tab |
 | Sample Terraform file | `data/sample.tf` | Everyone (demo input) |
 | Sample billing CSV | `data/sample_billing.csv` | Dev 3 FinOps Agent (demo input) |
 
-You have a unique dual role: two agents plus all the demo data. The demo data is arguably more important than the agents — if the sample data is bad, every agent produces bad output and the demo falls flat.
+You have a unique multi-part role: risk analysis, Watchdog outputs, and all the demo data. The demo data is arguably more important than the agents — if the sample data is bad, every agent produces bad output and the demo falls flat.
 
 ---
 
@@ -90,6 +104,48 @@ Shared time with the full team. Your priorities:
     ],
     "rollback_plan": "Full rollback strategy summary...",
     "success_criteria": ["All services responding on AWS endpoints", "Data integrity verified", "Latency within 10% of GCP baseline"]
+  }
+}
+```
+
+- Lock down the `watchdog` + `iac_bundle` output schema:
+
+```json
+{
+  "watchdog": {
+    "status": "active",
+    "scan_frequency": "15m",
+    "projected_monthly_aws_spend": 6830.00,
+    "projected_annual_savings": 47200.00,
+    "active_agents": ["risk", "finops", "watchdog"],
+    "anomaly_threshold_pct": 12,
+    "optimization_opportunities": [
+      {
+        "title": "Right-size EC2 instances",
+        "impact": "high",
+        "estimated_monthly_savings": 1180.00,
+        "confidence": 0.97,
+        "auto_fix_mode": "suggested"
+      }
+    ],
+    "auto_remediation_pipeline": [
+      {"stage": "detect", "description": "Watchdog scans spend, utilization, and drift."},
+      {"stage": "evaluate", "description": "Risk rules validate blast radius and rollback safety."},
+      {"stage": "apply", "description": "Recommended fix is generated or executed depending on mode."},
+      {"stage": "verify", "description": "Post-change health and cost metrics are checked."}
+    ]
+  },
+  "iac_bundle": {
+    "format": "terraform",
+    "mode": "generated_scaffold",
+    "files": [
+      {
+        "path": "terraform/networking/main.tf",
+        "description": "Target VPC and subnet layout"
+      }
+    ],
+    "assumptions": ["us-east-1 target region", "module-based layout", "remote state in S3"],
+    "deployment_notes": "Generated as a migration accelerator. Review before production apply."
   }
 }
 ```
@@ -965,9 +1021,27 @@ async def run(context: dict, claude_client) -> dict:
 
 **Deliverable by hour 5:** Risk Agent that combines deterministic rules with Claude analysis to produce a scored, categorized risk report.
 
-### Hours 5–8: Build the Runbook Generator
+### Hours 5–8: Build the Watchdog Agent
 
-**Step 1 — Runbook structure template**
+This is the product-parity section that closes the main gap between the website and the earlier plan.
+
+**Step 1 — Watchdog output contract**
+
+Build the fifth agent as `watchdog.py`. It consumes `gcp_inventory`, `aws_mapping`, `risks`, and `finops`, then emits:
+
+- `runbook`
+- `watchdog`
+- `iac_bundle`
+
+The Watchdog output is not just a chart payload. It is the post-migration operating plan:
+
+- monthly spend baseline and target savings
+- top optimization opportunities
+- anomaly threshold / scan frequency
+- Detect → Evaluate → Apply → Verify pipeline
+- whether actions are `suggested`, `simulated`, or `executable`
+
+**Step 2 — Runbook structure template**
 
 The runbook follows a fixed phase structure. Claude fills in the specific steps based on the migration context.
 
@@ -1095,21 +1169,39 @@ async def run(context: dict, claude_client) -> dict:
     return context
 ```
 
-**Deliverable by hour 8:** Runbook generator that produces a phased migration plan with the Day-0 FinOps purchase step built in.
+**Step 3 — IaC bundle generation**
+
+Generate a lightweight but tangible AWS Terraform scaffold. This does not need to be production-perfect, but it must be concrete enough that judges can see how RADCloud moves from recommendation to executable assets.
+
+The `iac_bundle` should include:
+
+- a list of generated files
+- code snippets or full file contents for the highest-value modules
+- assumptions and TODOs
+- deployment notes and validation warnings
+
+At minimum, generate stubs for:
+
+- networking
+- compute / containers
+- database
+- observability / budgets
+
+**Deliverable by hour 8:** Watchdog agent that produces a phased migration plan, a Watchdog dashboard payload, and a generated IaC bundle with the Day-0 FinOps purchase step built in.
 
 ### Hours 8–12: Integration
 
 - Push all your files to the repo:
   - `agents/risk.py`, `agents/risk_rules.py`, `agents/risk_taxonomy.py`
-  - `agents/runbook.py`
+  - `agents/watchdog.py`, `agents/runbook.py`, `agents/iac_generator.py`
   - `data/sample.tf`, `data/sample_billing.csv`
   - `scripts/generate_billing.py`
 - Work with Dev 1 to wire your agents into the pipeline replacing stubs.
 - Test end-to-end with the sample data:
-  - Upload sample.tf + sample_billing.csv → all 5 agents run → verify Risks tab and Runbook tab.
+  - Upload sample.tf + sample_billing.csv → all 5 agents run → verify Risks, Runbook, Watchdog, and IaC Output tabs.
 - Debug integration issues:
   - Risk agent receives mapping with different field names than expected → align with Dev 2.
-  - Runbook agent's Claude response is too long or gets truncated → reduce the context summary or increase max_tokens.
+  - Watchdog / runbook response is too long or gets truncated → reduce the context summary or increase max_tokens.
   - Risk severity badges in the frontend don't match your severity values → align with Dev 1.
 
 ### Hours 12–16: Polish
@@ -1124,6 +1216,11 @@ async def run(context: dict, claude_client) -> dict:
 - Verify that the FinOps step in Phase 5 references the actual RI recommendations from Dev 3's output.
 - Make sure `estimated_hours` per phase adds up to something reasonable.
 
+**Watchdog / IaC polish:**
+- Make sure the optimization opportunities shown in Watchdog are derived from real risk + FinOps outputs, not arbitrary filler.
+- Mark every remediation action as `suggested`, `simulated`, or `executable` so the product never over-claims.
+- Validate that generated Terraform file names, module boundaries, and assumptions are internally consistent.
+
 **Demo data polish (CRITICAL):**
 - Run the full pipeline 3–5 times with the sample data. Check:
   - Does the Discovery Agent find all ~30 resources?
@@ -1137,9 +1234,11 @@ async def run(context: dict, claude_client) -> dict:
 ### Hours 16–20: Demo Prep
 
 - Help Dev 1 build the cached demo response.
-- Write talking points for your two tabs:
+- Write talking points for your product surfaces:
   - **Risks tab:** "RADCloud identified 8 migration risks, including 2 high-severity items. The database migration requires AWS DMS with a planned cutover window. The IAM model needs redesigning — GCP's project-level bindings don't map 1:1 to AWS policies."
   - **Runbook tab:** "The migration is planned in 5 phases over 8–12 weeks. Notice Phase 5 — this is where RADCloud's Day-0 FinOps plan kicks in. Instead of waiting 3 months for a traditional FinOps tool, we purchase Reserved Instances on Day 1 based on patterns we already analyzed from GCP billing data."
+  - **Watchdog tab:** "Watchdog is the fifth agent. It takes the migration plan and turns it into an operating model: anomaly detection, optimization opportunities, remediation flow, and post-cutover cost guardrails from Day 0."
+  - **IaC Output tab:** "These Terraform artifacts are generated scaffolds, not blind one-click production applies. RADCloud accelerates the build-out, then engineers review and harden before deployment."
 - Prepare for judge questions:
   - "How do you know these risks are real?" → "The deterministic rules catch known incompatibilities — IAM model differences, firewall-to-security-group translation, partial service mappings. Claude adds contextual risks like pipeline rearchitecting that rules can't detect."
   - "How detailed is the runbook?" → "Each step has an owner, time estimate, dependencies, and a specific rollback procedure. It's a starting point, not a finished project plan — but it gives migration teams a 70% head start."
@@ -1159,7 +1258,10 @@ async def run(context: dict, claude_client) -> dict:
 | `agents/risk.py` | Risk Agent — main entry point |
 | `agents/risk_rules.py` | Deterministic risk detection rules |
 | `agents/risk_taxonomy.py` | Risk categories and severity criteria |
-| `agents/runbook.py` | Runbook Generator Agent |
+| `agents/watchdog.py` | Final agent wrapper — emits Watchdog, runbook, and IaC outputs |
+| `agents/runbook.py` | Runbook Generator component |
+| `agents/iac_generator.py` | AWS Terraform / IaC scaffold generator |
+| `agents/watchdog_rules.py` | Remediation modes, anomaly thresholds, and post-migration policy rules |
 | `data/sample.tf` | Demo Terraform file (NovaPay infrastructure) |
 | `data/sample_billing.csv` | Demo billing CSV (12 months, ~$8K–$12K/month) |
 | `scripts/generate_billing.py` | Billing data generator script |
@@ -1183,6 +1285,8 @@ Run through this before declaring demo data complete:
 - [ ] Q4 months show a seasonal spike (makes the data look real)
 - [ ] Running the full pipeline produces `total_first_year_savings` in the $35K–$50K range
 - [ ] The billing CSV includes the cost column header format Dev 3 expects: `Cost ($)`
+- [ ] The sample infrastructure is rich enough to create 3–5 believable Watchdog optimization opportunities
+- [ ] The generated IaC bundle contains at least networking + compute + database + observability stubs
 
 ---
 
@@ -1203,13 +1307,18 @@ Fix: Cap Claude at 2–3 additional risks. The deterministic rules usually produ
 **Runbook steps reference AWS services that Dev 2's mapping didn't include.**
 Fix: The runbook prompt receives the mapping summary, so Claude should only reference mapped services. If it hallucinates a service, the fallback runbook kicks in — it's generic but correct.
 
+**Watchdog over-claims auto-remediation that the product cannot safely execute.**
+Fix: Be explicit in the schema and UI mode labels. Default to `suggested` or `simulated`. Only mark actions `executable` if there is a real implementation path.
+
 ---
 
 ## What to Cut If Behind
 
 1. **Cut the Claude-powered deep risk analysis** — the deterministic rules alone produce a solid 4–6 risks. Skip the Claude call entirely.
 2. **Cut the runbook detail** — use the hardcoded fallback runbook (5 phases, 1 step each). It's thin but structurally correct.
-3. **Cut risk taxonomy severity rules** — just hardcode severity in the detection rules instead of looking it up.
-4. **Never cut the demo data** — this is your #1 deliverable. Without it, nobody can demo anything.
-5. **Never cut the deterministic risk rules** — the IAM risk, database risk, and firewall risk are the three risks that make the tool look credible. They must appear in every run.
-6. **Never cut the Day-0 FinOps step in the runbook** — this is the thread that ties the entire narrative together. Phase 5 must include "purchase Reserved Instances per Day-0 plan."
+3. **Cut executable remediation, not the Watchdog surface** — suggested/simulated actions are acceptable if the UI and schema remain intact.
+4. **Cut risk taxonomy severity rules** — just hardcode severity in the detection rules instead of looking it up.
+5. **Never cut the demo data** — this is your #1 deliverable. Without it, nobody can demo anything.
+6. **Never cut the deterministic risk rules** — the IAM risk, database risk, and firewall risk are the three risks that make the tool look credible. They must appear in every run.
+7. **Never cut the Day-0 FinOps step in the runbook** — this is the thread that ties the entire narrative together. Phase 5 must include "purchase Reserved Instances per Day-0 plan."
+8. **Never cut the IaC bundle** — even a scaffold-level output is required to support the website's generated Terraform claim.

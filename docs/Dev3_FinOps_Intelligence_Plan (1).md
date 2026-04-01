@@ -5,7 +5,7 @@
 **Time Budget:** 24 hours  
 **Stack:** Python, Claude API (claude-sonnet-4-20250514), pandas for billing analysis  
 **Dependencies inbound:** `aws_mapping` from Dev 2 (available after hour 8). You can work independently until then using your own test data.  
-**Dependencies outbound:** Dev 4 (Runbook) consumes your `finops` output. Dev 1 (Frontend) renders your data in the most important tab of the entire demo.
+**Dependencies outbound:** Dev 4 (Watchdog / Runbook / IaC) consumes your `finops` output. Dev 1 (Frontend) renders your data in the most important tab of the entire demo.
 
 ---
 
@@ -15,15 +15,33 @@ You are the reason RADCloud wins the hackathon. The Day-0 FinOps savings number 
 
 ---
 
+## Product Parity Requirements
+
+The website positions RADCloud as using AWS Pricing API, Cost Explorer, and Compute Optimizer. Your implementation plan must therefore support **real adapters with reliable fallbacks**:
+
+- Build the FinOps engine behind adapter interfaces for:
+  - AWS Pricing API
+  - Cost Explorer
+  - Compute Optimizer
+- If credentials, auth, or time run out, fall back to demo-safe reference pricing and heuristic optimizer logic.
+- Preserve the same output schema regardless of whether data came from live AWS APIs or fallback tables.
+
+This keeps the product promise honest while still being hackathon-safe.
+
+---
+
 ## What You Produce
 
 | Output (context key) | Contents | Who consumes it |
 |----------------------|----------|-----------------|
 | `finops.cost_comparison` | Monthly GCP vs AWS (on-demand) vs AWS (optimized) | Frontend FinOps tab |
-| `finops.ri_recommendations` | Specific RI/Savings Plans to buy on Day 1 | Frontend FinOps tab, Runbook Agent |
+| `finops.ri_recommendations` | Specific RI/Savings Plans to buy on Day 1 | Frontend FinOps tab, Watchdog Agent |
 | `finops.usage_patterns` | Detected workload patterns from billing history | Frontend FinOps tab |
 | `finops.total_first_year_savings` | The hero number — dollars saved vs. traditional approach | Frontend FinOps tab (big green card) |
 | `finops.summary` | Natural language cost report | Frontend FinOps tab |
+| `finops.pricing_sources` | Whether numbers came from live AWS APIs or fallback tables | Frontend FinOps tab, Watchdog Agent |
+| `finops.optimizer_recommendations` | Compute Optimizer-style rightsizing suggestions | Watchdog Agent, Frontend Watchdog tab |
+| `finops.watchdog_baseline` | Monthly spend baseline, targets, and anomaly thresholds | Watchdog Agent |
 
 The `finops.total_first_year_savings` number is the single most important data point in the entire demo. It must be derived from the actual billing data, not hardcoded. Judges will ask how you calculated it.
 
@@ -112,6 +130,30 @@ Shared time with the team. Your priorities:
     "total_monthly_savings": 470.00,
     "total_first_year_savings": 47200.00,
     "savings_vs_observation_window": 14100.00,
+
+    "pricing_sources": {
+      "aws_pricing_api": "fallback_table",
+      "cost_explorer": "not_connected",
+      "compute_optimizer": "heuristic"
+    },
+
+    "optimizer_recommendations": [
+      {
+        "resource_id": "web-server-1",
+        "current_shape": "m5.xlarge",
+        "recommended_shape": "m6i.large",
+        "reason": "Sustained utilization below 45% across 12 months of projected workload",
+        "estimated_monthly_savings": 118.20,
+        "confidence": 0.92
+      }
+    ],
+
+    "watchdog_baseline": {
+      "projected_monthly_aws_spend": 6830.00,
+      "target_monthly_savings": 2320.00,
+      "alert_threshold_pct": 12,
+      "top_cost_services": ["EC2", "RDS", "S3"]
+    },
 
     "summary": "Natural language paragraph summarizing the findings..."
   }
@@ -312,9 +354,18 @@ Run the parser and pattern analyzer on this. Verify that Compute Engine and Clou
 
 This is where you build the killer feature.
 
-**Step 1 — AWS pricing reference table**
+**Step 1 — AWS pricing adapter layer**
 
-You cannot call the AWS Pricing API in a hackathon (auth, setup, rate limits). Instead, hardcode a reference pricing table for common services. These are approximate us-east-1 prices — close enough for a demo.
+Preferred approach: implement a provider abstraction first. Try live integrations where available, but always support deterministic fallback tables so the demo is never blocked by auth, setup, or rate limits.
+
+Priority order:
+
+1. AWS Pricing API adapter
+2. Cost Explorer adapter
+3. Compute Optimizer adapter
+4. Fallback static pricing / heuristics
+
+If live adapters are unavailable, the product still ships using the fallback path with transparent `pricing_sources` metadata in the response.
 
 ```python
 # agents/aws_pricing.py
@@ -807,6 +858,9 @@ Make sure `savings_vs_observation_window` is prominent. This is the number that 
 | `agents/cost_engine.py` | AWS cost projection + RI recommendation engine |
 | `agents/cost_comparison.py` | Monthly GCP vs AWS comparison builder |
 | `agents/aws_pricing.py` | Hardcoded AWS pricing reference tables |
+| `agents/pricing_adapter.py` | Live Pricing API adapter + fallback selector |
+| `agents/cost_explorer_adapter.py` | Optional Cost Explorer pull-through for baseline comparisons |
+| `agents/optimizer_adapter.py` | Compute Optimizer-style recommendation adapter / heuristic fallback |
 | `scripts/generate_test_billing.py` | Test billing data generator (for dev/testing) |
 
 ---
@@ -846,6 +900,9 @@ Fix: The column normalizer handles common variants. If it still fails, fall back
 **aws_mapping isn't available yet (Dev 2 is behind).**
 Fix: Your cost engine should work without mappings by using default instance types. The pattern analyzer and billing parser don't need mappings at all. You can produce a FinOps report with just billing data.
 
+**AWS API credentials aren't available or the adapters error out.**
+Fix: Fall back automatically to the reference pricing tables and heuristic optimizer logic. Populate `pricing_sources` honestly so the UI and judges know what mode the product is running in.
+
 **The savings number is too small to be impressive.**
 Fix: Tune the sample billing data. Increase the compute hours, add a second database instance, add a Memorystore instance. Steady-state services drive RI savings — more steady-state services = bigger number.
 
@@ -862,6 +919,7 @@ Fix: You have a hardcoded fallback summary that uses f-strings with the actual n
 1. **Cut the natural language summary** — the numbers and tables speak for themselves. Use the hardcoded fallback f-string.
 2. **Cut usage pattern descriptions** — just show the classification (steady_state/bursty) without the prose explanation.
 3. **Cut per-month comparison** — show only the monthly averages, not all 12 months.
-4. **Cut ElastiCache/Lambda/Fargate pricing** — focus on EC2 and RDS. These two services drive 80% of RI savings.
-5. **Never cut the RI recommendations** — this is the core deliverable.
-6. **Never cut `total_first_year_savings`** — this is the hero number. Without it, you don't have a demo.
+4. **Cut live AWS adapters before cutting the schema** — keep `pricing_sources`, `optimizer_recommendations`, and `watchdog_baseline` even if they come from fallbacks.
+5. **Cut ElastiCache/Lambda/Fargate pricing** — focus on EC2 and RDS. These two services drive 80% of RI savings.
+6. **Never cut the RI recommendations** — this is the core deliverable.
+7. **Never cut `total_first_year_savings`** — this is the hero number. Without it, you don't have a demo.

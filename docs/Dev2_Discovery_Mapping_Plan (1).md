@@ -4,7 +4,7 @@
 **Role:** Discovery Agent + Mapping Agent  
 **Time Budget:** 24 hours  
 **Stack:** Python, Claude API (claude-sonnet-4-20250514), JSON mapping tables  
-**Dependencies:** None inbound. Dev 1 (Orchestrator), Dev 3 (FinOps), and Dev 4 (Risk + Runbook) all depend on your output.
+**Dependencies:** None inbound. Dev 1 (Orchestrator), Dev 3 (FinOps), and Dev 4 (Risk + Watchdog / Runbook / IaC) all depend on your output.
 
 ---
 
@@ -14,12 +14,25 @@ You turn raw GCP infrastructure config into a structured inventory and then tran
 
 ---
 
+## Product Parity Requirements
+
+The website promise is bigger than a simple service mapping table. Your outputs must enable:
+
+- credible GCP inventory discovery from Terraform, YAML, or gcloud-style text
+- AWS target design detailed enough for FinOps pricing and Watchdog monitoring
+- generated IaC scaffolding hints, not just narrative mapping
+- post-migration observability / optimization surfaces in the Watchdog dashboard
+
+That means your schemas must include enough metadata for downstream agents to build **runbook**, **watchdog**, and **iac_bundle** outputs without inventing structure later.
+
+---
+
 ## What You Produce
 
 | Agent | Input | Output (context key) | Who consumes it |
 |-------|-------|---------------------|-----------------|
-| Discovery | `gcp_config_raw` (Terraform/YAML string) | `gcp_inventory` | Mapping Agent, Risk Agent, Runbook Agent |
-| Mapping | `gcp_inventory` | `aws_mapping` + `aws_architecture` | Risk Agent, FinOps Agent, Runbook Agent, Frontend |
+| Discovery | `gcp_config_raw` (Terraform/YAML string) | `gcp_inventory` | Mapping Agent, Risk Agent, Watchdog Agent |
+| Mapping | `gcp_inventory` | `aws_mapping` + `aws_architecture` | Risk Agent, FinOps Agent, Watchdog Agent, Frontend |
 
 You are the first two agents in the pipeline. If your output schema is wrong or incomplete, every downstream agent breaks. Get the schema right in hour 0–1 and don't change it after hour 4.
 
@@ -80,7 +93,20 @@ This is shared time with the full team. Your priority in this hour:
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "target_runtime": "ec2_asg",
+      "terraform_resource_type": "aws_instance",
+      "terraform_hints": {
+        "module": "modules/compute/ec2",
+        "required_inputs": ["instance_type", "subnet_id", "security_group_ids", "ami"],
+        "depends_on": ["networking", "iam"]
+      },
+      "observability_hooks": {
+        "cloudwatch_metrics": ["CPUUtilization", "NetworkIn", "StatusCheckFailed"],
+        "logs": ["/aws/ec2/application"],
+        "alarms": ["cpu_high", "healthcheck_failures"]
+      },
+      "watchdog_priority": "high"
     }
   ],
   "aws_architecture": {
@@ -91,6 +117,9 @@ This is shared time with the full team. Your priority in this hour:
       "subnet_strategy": "public + private per AZ",
       "security_groups": ["web-sg", "db-sg", "lambda-sg"]
     },
+    "deployment_pattern": "landing-zone + shared services + workload stack",
+    "observability_stack": ["CloudWatch", "AWS Config", "Budgets", "GuardDuty"],
+    "terraform_modules": ["networking", "compute", "database", "storage", "observability"],
     "total_resources": 15,
     "direct_mappings": 12,
     "partial_mappings": 2,
@@ -101,6 +130,7 @@ This is shared time with the full team. Your priority in this hour:
 
 - Confirm with Dev 3 (FinOps) that `aws_mapping` contains enough info for cost estimation — they need `aws_config.instance_type`, `aws_config.region`, etc.
 - Confirm with Dev 4 (Risk) that `mapping_confidence` and `gap_flag` fields are present — they build their risk scoring on these.
+- Confirm with Dev 4 (Watchdog) that `terraform_hints`, `target_runtime`, `observability_hooks`, and `watchdog_priority` are present — they use these to generate IaC and post-migration remediation outputs.
 
 ### Hours 1–4: Build the Discovery Agent
 
@@ -108,7 +138,11 @@ This is shared time with the full team. Your priority in this hour:
 
 **Step 1 — The GCP service registry (hardcoded reference)**
 
-Create a JSON file listing all GCP services you support, so Claude knows what to look for:
+Create a JSON file listing all GCP services you support, so Claude knows what to look for. Each service entry should eventually drive three downstream concerns:
+
+- mapping to the AWS service
+- Terraform / IaC generation hints
+- observability / Watchdog defaults
 
 ```python
 # agents/gcp_services.py
@@ -749,6 +783,8 @@ async def call_claude_with_retry(claude_client, messages, system, max_retries=2)
 | `agents/gcp_services.py` | Registry of supported GCP service types |
 | `agents/aws_mapping_table.py` | GCP service → AWS service mapping with confidence levels |
 | `agents/instance_mapping.py` | Machine types, regions, storage classes, disk types |
+| `agents/iac_hints.py` | AWS Terraform module/resource hint table for downstream generation |
+| `agents/observability_mapping.py` | Service-level metrics/log/alert defaults for Watchdog |
 
 ---
 
@@ -775,3 +811,4 @@ Fix: The deterministic mapping handles the service-level mapping. Claude handles
 3. **Cut the less common services** (Spanner, Dataflow) — focus on the 10 most common: Compute, Cloud SQL, GCS, Cloud Run, Functions, Pub/Sub, BigQuery, VPC, Firewall, IAM.
 4. **Never cut the mapping table** — this is your core deliverable. Without it, Dev 3 and Dev 4 have nothing to work with.
 5. **Never cut the gap flags** — judges want to see that the tool identifies what doesn't translate cleanly. That's what makes it credible.
+6. **Never cut Terraform / observability hints** — without them, the product cannot honestly claim generated IaC and Watchdog support.
