@@ -17,11 +17,81 @@ _ARCH_SUMMARY = (
     "Lambda + EventBridge for Cloud Functions, SNS+SQS replacing Pub/Sub, Athena+Glue for BigQuery workloads."
 )
 
+# Map AWS service → deployment runtime for downstream agents.
+_TARGET_RUNTIME: dict[str, str] = {
+    "EC2": "ec2",
+    "RDS": "rds",
+    "ElastiCache": "elasticache",
+    "S3": "s3",
+    "ECS Fargate": "fargate",
+    "Lambda": "lambda",
+    "SNS": "sns",
+    "SQS": "sqs",
+    "Athena": "athena",
+    "Glue Data Catalog": "glue",
+    "VPC": "networking",
+    "IAM": "iam",
+}
 
-def _cfg_summary(cfg: dict) -> str:
-    parts = [f"{k}={v}" for k, v in list(cfg.items())[:6]]
-    return ", ".join(parts)[:120]
+# ---------------------------------------------------------------------------
+# LLM enrichment prompt
+# ---------------------------------------------------------------------------
 
+_ENRICHMENT_SYSTEM_PROMPT = """\
+You are an AWS Solutions Architect reviewing a preliminary GCP-to-AWS \
+migration mapping. You will receive a JSON array of mapping entries. \
+Each entry already has a deterministic mapping, but some have \
+``gap_flag: true`` indicating the mapping is partial or uncertain.
+
+For each entry with ``gap_flag: true``, review and improve:
+
+1. **gap_notes** — Write a concise, actionable migration note explaining \
+what the gap is and how to address it (1-2 sentences).
+2. **aws_config** — Add or correct any fields in the ``aws_config`` dict \
+that the deterministic mapper may have missed. Do NOT remove existing fields.
+
+For entries with ``gap_flag: false``, you may optionally add a brief \
+``gap_notes`` with a helpful migration tip, but do NOT change ``aws_config``.
+
+Return a JSON array of objects, one per input entry, with exactly these keys:
+```
+{
+  "gcp_resource_id": "<same as input>",
+  "gap_notes": "<improved or new migration note, or null>",
+  "aws_config_additions": { <any new key-value pairs to merge into aws_config> }
+}
+```
+
+Rules:
+- Return ONLY the JSON array. No markdown, no code fences, no explanation.
+- Keep the same order as the input.
+- For entries you don't want to change, return an empty ``aws_config_additions`` dict and the existing ``gap_notes``.
+"""
+
+_NARRATIVE_SYSTEM_PROMPT = """\
+You are an AWS Solutions Architect writing a migration architecture summary. \
+You will receive a JSON object with two keys:
+
+- ``services_used`` — list of AWS services in the target architecture
+- ``mapping_summary`` — aggregated counts and key resource mappings
+
+Write a concise architecture narrative (2–3 paragraphs, ~150–250 words) that:
+
+1. Describes the target AWS architecture at a high level — VPC layout, \
+compute tier, data tier, serverless components.
+2. Highlights key migration decisions (e.g. Cloud Run → Fargate, \
+Cloud SQL → Multi-AZ RDS, Pub/Sub → SNS+SQS).
+3. Notes any gaps or areas needing manual review.
+
+Write in a professional, technical tone suitable for a migration proposal. \
+Do NOT use markdown headings, bullet lists, or code blocks — write flowing \
+prose paragraphs only. Return ONLY the narrative text, no JSON wrapping.
+"""
+
+
+# ---------------------------------------------------------------------------
+# Main entry point
+# ---------------------------------------------------------------------------
 
 def _stub_map_resource(r: dict) -> dict:
     """Rule-based fallback mapping for a single GCP resource."""
@@ -216,8 +286,23 @@ Also provide an architecture_summary describing the target AWS environment."""
     partial = sum(1 for m in rows if m["mapping_confidence"] == "partial")
     none_eq = sum(1 for m in rows if m["mapping_confidence"] == "none")
 
-    context["aws_mapping"] = rows
-    context["aws_architecture"] = {
+    # Unique AWS services actually used.
+    services_used = sorted({m["aws_service"] for m in rows if m["aws_service"] != "Unknown"})
+
+    # Networking details from actual VPC/subnet/SG rows.
+    vpc_count = sum(1 for m in rows if m["aws_type"] == "vpc")
+    subnets = [m for m in rows if m["aws_type"] == "subnet"]
+    sg_rules = [m for m in rows if m["aws_type"] == "security_group_rule"]
+
+    # Derive security group names from firewall rule names.
+    sg_names = []
+    for m in sg_rules:
+        name = m["gcp_resource_id"]
+        # Convert GCP firewall name to AWS SG name style
+        sg_name = name.replace("fw-", "").replace("-", "_") + "-sg"
+        sg_names.append(sg_name)
+
+    return {
         "summary": _ARCH_SUMMARY,
         "services_used": list({m["aws_service"] for m in rows}),
         "networking": {"vpc_count": 1, "subnet_strategy": "public + private per AZ",

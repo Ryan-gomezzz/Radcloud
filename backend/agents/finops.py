@@ -190,3 +190,17 @@ Return this exact JSON structure (fill in realistic numbers):
 
     context["finops"] = _STUB_FINOPS
     return context
+
+
+# Mapping for watchdog baseline service names
+GCP_TO_AWS_CATEGORY: dict[str, str] = {
+    "Compute Engine":  "EC2",
+    "Cloud SQL":       "RDS",
+    "Cloud Storage":   "S3",
+    "Cloud Run":       "Fargate",
+    "Cloud Functions": "Lambda",
+    "Memorystore":     "ElastiCache",
+    "BigQuery":        "Athena",
+    "Cloud Pub/Sub":   "SNS/SQS",
+    "Networking":      "Data Transfer",
+}

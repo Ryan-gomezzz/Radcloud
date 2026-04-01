@@ -1,109 +1,289 @@
-billing_month,service,sku_description,usage_amount,usage_unit,cost
-2024-01,Compute Engine,N1 Standard Instance,720,hours,3150.20
-2024-01,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2680.40
-2024-01,Cloud Storage,Standard Storage TB-mo,42,GB-mo,180.10
-2024-01,Cloud Run,CPU allocation,480000,CPU-seconds,420.00
-2024-01,Cloud Functions,Invocations + GB-sec,1e+07,requests,210.50
-2024-01,Pub/Sub,Message delivery,8.2e+09,operations,95.00
-2024-01,BigQuery,Analysis TB,18,TB,340.00
-2024-01,Networking,Cloud NAT + egress,1,month,280.00
-2024-01,Memorystore,Redis STANDARD_HA 5GB,720,hours,420.80
-2024-02,Compute Engine,N1 Standard Instance,720,hours,3220.00
-2024-02,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2710.50
-2024-02,Cloud Storage,Standard + Nearline,48,GB-mo,195.00
-2024-02,Cloud Run,CPU allocation,510000,CPU-seconds,445.00
-2024-02,Cloud Functions,Invocations + GB-sec,1.1e+07,requests,225.00
-2024-02,Pub/Sub,Message delivery,8.5e+09,operations,102.00
-2024-02,BigQuery,Analysis TB,19,TB,355.00
-2024-02,Networking,Cloud NAT + egress,1,month,290.00
-2024-02,Memorystore,Redis STANDARD_HA 5GB,720,hours,428.50
-2024-03,Compute Engine,N1 Standard Instance,720,hours,3280.30
-2024-03,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2750.00
-2024-03,Cloud Storage,Standard + Nearline,50,GB-mo,205.00
-2024-03,Cloud Run,CPU allocation,530000,CPU-seconds,460.00
-2024-03,Cloud Functions,Invocations + GB-sec,1.15e+07,requests,232.00
-2024-03,Pub/Sub,Message delivery,8.8e+09,operations,108.00
-2024-03,BigQuery,Analysis TB,20,TB,368.00
-2024-03,Networking,Cloud NAT + egress,1,month,298.70
-2024-03,Memorystore,Redis STANDARD_HA 5GB,720,hours,435.00
-2024-04,Compute Engine,N1 Standard Instance,720,hours,3310.00
-2024-04,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2785.00
-2024-04,Cloud Storage,Standard + Nearline,52,GB-mo,212.00
-2024-04,Cloud Run,CPU allocation,545000,CPU-seconds,472.00
-2024-04,Cloud Functions,Invocations + GB-sec,1.2e+07,requests,238.00
-2024-04,Pub/Sub,Message delivery,9e+09,operations,112.00
-2024-04,BigQuery,Analysis TB,21,TB,378.00
-2024-04,Networking,Cloud NAT + egress,1,month,305.00
-2024-04,Memorystore,Redis STANDARD_HA 5GB,720,hours,440.00
-2024-05,Compute Engine,N1 Standard Instance,720,hours,3345.00
-2024-05,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2810.00
-2024-05,Cloud Storage,Standard + Nearline,54,GB-mo,218.00
-2024-05,Cloud Run,CPU allocation,560000,CPU-seconds,485.00
-2024-05,Cloud Functions,Invocations + GB-sec,1.22e+07,requests,242.00
-2024-05,Pub/Sub,Message delivery,9.2e+09,operations,118.00
-2024-05,BigQuery,Analysis TB,22,TB,388.00
-2024-05,Networking,Cloud NAT + egress,1,month,312.00
-2024-05,Memorystore,Redis STANDARD_HA 5GB,720,hours,445.00
-2024-06,Compute Engine,N1 Standard Instance,720,hours,3360.00
-2024-06,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2825.00
-2024-06,Cloud Storage,Standard + Nearline,55,GB-mo,220.00
-2024-06,Cloud Run,CPU allocation,565000,CPU-seconds,490.00
-2024-06,Cloud Functions,Invocations + GB-sec,1.25e+07,requests,245.00
-2024-06,Pub/Sub,Message delivery,9.3e+09,operations,120.00
-2024-06,BigQuery,Analysis TB,22,TB,390.00
-2024-06,Networking,Cloud NAT + egress,1,month,315.00
-2024-06,Memorystore,Redis STANDARD_HA 5GB,720,hours,448.00
-2024-07,Compute Engine,N1 Standard Instance,720,hours,3420.00
-2024-07,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2860.00
-2024-07,Cloud Storage,Standard + Nearline,56,GB-mo,225.00
-2024-07,Cloud Run,CPU allocation,580000,CPU-seconds,505.00
-2024-07,Cloud Functions,Invocations + GB-sec,1.28e+07,requests,250.00
-2024-07,Pub/Sub,Message delivery,9.5e+09,operations,125.00
-2024-07,BigQuery,Analysis TB,23,TB,400.00
-2024-07,Networking,Cloud NAT + egress,1,month,322.00
-2024-07,Memorystore,Redis STANDARD_HA 5GB,720,hours,455.00
-2024-08,Compute Engine,N1 Standard Instance,720,hours,3380.00
-2024-08,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2835.00
-2024-08,Cloud Storage,Standard + Nearline,55,GB-mo,222.00
-2024-08,Cloud Run,CPU allocation,575000,CPU-seconds,498.00
-2024-08,Cloud Functions,Invocations + GB-sec,1.26e+07,requests,246.00
-2024-08,Pub/Sub,Message delivery,9.4e+09,operations,122.00
-2024-08,BigQuery,Analysis TB,22,TB,392.00
-2024-08,Networking,Cloud NAT + egress,1,month,318.00
-2024-08,Memorystore,Redis STANDARD_HA 5GB,720,hours,450.00
-2024-09,Compute Engine,N1 Standard Instance,720,hours,3300.00
-2024-09,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2790.00
-2024-09,Cloud Storage,Standard + Nearline,53,GB-mo,215.00
-2024-09,Cloud Run,CPU allocation,555000,CPU-seconds,478.00
-2024-09,Cloud Functions,Invocations + GB-sec,1.2e+07,requests,236.00
-2024-09,Pub/Sub,Message delivery,9.1e+09,operations,115.00
-2024-09,BigQuery,Analysis TB,21,TB,382.00
-2024-09,Networking,Cloud NAT + egress,1,month,308.00
-2024-09,Memorystore,Redis STANDARD_HA 5GB,720,hours,442.00
-2024-10,Compute Engine,N1 Standard Instance,720,hours,3260.00
-2024-10,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2765.00
-2024-10,Cloud Storage,Standard + Nearline,52,GB-mo,210.00
-2024-10,Cloud Run,CPU allocation,548000,CPU-seconds,468.00
-2024-10,Cloud Functions,Invocations + GB-sec,1.18e+07,requests,232.00
-2024-10,Pub/Sub,Message delivery,8.9e+09,operations,110.00
-2024-10,BigQuery,Analysis TB,20,TB,375.00
-2024-10,Networking,Cloud NAT + egress,1,month,300.00
-2024-10,Memorystore,Redis STANDARD_HA 5GB,720,hours,438.00
-2024-11,Compute Engine,N1 Standard Instance,720,hours,3290.00
-2024-11,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2780.00
-2024-11,Cloud Storage,Standard + Nearline,53,GB-mo,214.00
-2024-11,Cloud Run,CPU allocation,552000,CPU-seconds,475.00
-2024-11,Cloud Functions,Invocations + GB-sec,1.2e+07,requests,235.00
-2024-11,Pub/Sub,Message delivery,9e+09,operations,114.00
-2024-11,BigQuery,Analysis TB,21,TB,380.00
-2024-11,Networking,Cloud NAT + egress,1,month,306.00
-2024-11,Memorystore,Redis STANDARD_HA 5GB,720,hours,441.00
-2024-12,Compute Engine,N1 Standard Instance,720,hours,3320.00
-2024-12,Cloud SQL,PostgreSQL db-n1-standard-4,720,hours,2800.00
-2024-12,Cloud Storage,Standard + Nearline,54,GB-mo,217.00
-2024-12,Cloud Run,CPU allocation,558000,CPU-seconds,482.00
-2024-12,Cloud Functions,Invocations + GB-sec,1.21e+07,requests,238.00
-2024-12,Pub/Sub,Message delivery,9.1e+09,operations,116.00
-2024-12,BigQuery,Analysis TB,21,TB,385.00
-2024-12,Networking,Cloud NAT + egress,1,month,310.00
-2024-12,Memorystore,Redis STANDARD_HA 5GB,720,hours,444.00
+Service description,SKU description,Usage start date,Usage end date,Usage amount,Usage unit,Cost ($)
+Compute Engine,N1 HighMem-8 running in Americas,2024-01-01,2024-01-30,742.21,hour,792.68
+Compute Engine,N1 HighMem-8 running in Americas,2024-01-01,2024-01-30,688.39,hour,735.2
+Compute Engine,N1 Standard-8 running in Americas,2024-01-01,2024-01-30,710.29,hour,544.79
+Compute Engine,N1 Standard-8 running in Americas,2024-01-01,2024-01-30,705.75,hour,541.31
+Compute Engine,N1 Standard-16 running in Americas,2024-01-01,2024-01-30,750.71,hour,1151.6
+Compute Engine,N1 Standard-8 running in Americas,2024-01-01,2024-01-30,745.48,hour,571.78
+Compute Engine,SSD backed PD capacity,2024-01-01,2024-01-30,2722.36,gibibyte month,163.34
+Compute Engine,N1 Standard-4 with GPU running,2024-01-01,2024-01-30,693.82,hour,608.48
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-01-01,2024-01-30,723.16,hour,1050.03
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-01-01,2024-01-30,688.81,hour,528.32
+Cloud SQL,Storage: SSD,2024-01-01,2024-01-30,966.24,gibibyte month,164.26
+Cloud SQL,Automated Backup storage,2024-01-01,2024-01-30,800.51,gibibyte month,110.47
+Memorystore,Redis Standard M5 running,2024-01-01,2024-01-30,688.52,hour,325.67
+Memorystore,Redis Standard M4 running,2024-01-01,2024-01-30,703.62,hour,216.71
+Cloud Storage,Standard Storage US Multi-region,2024-01-01,2024-01-30,6616.91,gibibyte month,172.04
+Cloud Storage,Download Egress Americas,2024-01-01,2024-01-30,502.7,gibibyte,60.32
+Cloud Run,CPU Allocation Time,2024-01-01,2024-01-30,5438873.7,vcpu-second,130.53
+Cloud Run,Memory Allocation Time,2024-01-01,2024-01-30,16788817.0,gibibyte-second,41.97
+Cloud Functions,CPU Time,2024-01-01,2024-01-30,6399362.87,GHz-second,63.99
+Cloud Functions,Invocations,2024-01-01,2024-01-30,13133629.07,count,5.25
+BigQuery,Analysis Bytes Processed,2024-01-01,2024-01-30,149.88,tebibyte,749.39
+Networking,Network Egress via Carrier Peering,2024-01-01,2024-01-30,3517.02,gibibyte,298.95
+Networking,Network Inter Region Egress,2024-01-01,2024-01-30,5520.75,gibibyte,66.25
+Cloud Pub/Sub,Message Delivery Basic,2024-01-01,2024-01-30,1965.88,mebibyte,78.64
+Compute Engine,N1 HighMem-8 running in Americas,2024-02-01,2024-03-01,770.05,hour,822.42
+Compute Engine,N1 HighMem-8 running in Americas,2024-02-01,2024-03-01,715.69,hour,764.35
+Compute Engine,N1 Standard-8 running in Americas,2024-02-01,2024-03-01,694.32,hour,532.55
+Compute Engine,N1 Standard-8 running in Americas,2024-02-01,2024-03-01,694.67,hour,532.81
+Compute Engine,N1 Standard-16 running in Americas,2024-02-01,2024-03-01,760.44,hour,1166.52
+Compute Engine,N1 Standard-8 running in Americas,2024-02-01,2024-03-01,739.09,hour,566.88
+Compute Engine,SSD backed PD capacity,2024-02-01,2024-03-01,2695.82,gibibyte month,161.75
+Compute Engine,N1 Standard-4 with GPU running,2024-02-01,2024-03-01,750.12,hour,657.86
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-02-01,2024-03-01,733.17,hour,1064.57
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-02-01,2024-03-01,771.44,hour,591.7
+Cloud SQL,Storage: SSD,2024-02-01,2024-03-01,985.42,gibibyte month,167.52
+Cloud SQL,Automated Backup storage,2024-02-01,2024-03-01,805.0,gibibyte month,111.09
+Memorystore,Redis Standard M5 running,2024-02-01,2024-03-01,758.86,hour,358.94
+Memorystore,Redis Standard M4 running,2024-02-01,2024-03-01,740.38,hour,228.04
+Cloud Storage,Standard Storage US Multi-region,2024-02-01,2024-03-01,6782.13,gibibyte month,176.34
+Cloud Storage,Download Egress Americas,2024-02-01,2024-03-01,504.64,gibibyte,60.56
+Cloud Run,CPU Allocation Time,2024-02-01,2024-03-01,12991320.64,vcpu-second,311.79
+Cloud Run,Memory Allocation Time,2024-02-01,2024-03-01,4072290.58,gibibyte-second,10.18
+Cloud Functions,CPU Time,2024-02-01,2024-03-01,2430405.73,GHz-second,24.3
+Cloud Functions,Invocations,2024-02-01,2024-03-01,40715326.45,count,16.29
+BigQuery,Analysis Bytes Processed,2024-02-01,2024-03-01,102.69,tebibyte,513.43
+Networking,Network Egress via Carrier Peering,2024-02-01,2024-03-01,2772.47,gibibyte,235.66
+Networking,Network Inter Region Egress,2024-02-01,2024-03-01,4803.0,gibibyte,57.64
+Cloud Pub/Sub,Message Delivery Basic,2024-02-01,2024-03-01,2111.34,mebibyte,84.45
+Compute Engine,N1 HighMem-8 running in Americas,2024-03-01,2024-03-30,741.89,hour,792.33
+Compute Engine,N1 HighMem-8 running in Americas,2024-03-01,2024-03-30,718.16,hour,766.99
+Compute Engine,N1 Standard-8 running in Americas,2024-03-01,2024-03-30,718.63,hour,551.19
+Compute Engine,N1 Standard-8 running in Americas,2024-03-01,2024-03-30,704.55,hour,540.39
+Compute Engine,N1 Standard-16 running in Americas,2024-03-01,2024-03-30,709.59,hour,1088.51
+Compute Engine,N1 Standard-8 running in Americas,2024-03-01,2024-03-30,768.25,hour,589.25
+Compute Engine,SSD backed PD capacity,2024-03-01,2024-03-30,2646.19,gibibyte month,158.77
+Compute Engine,N1 Standard-4 with GPU running,2024-03-01,2024-03-30,739.56,hour,648.59
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-03-01,2024-03-30,701.19,hour,1018.13
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-03-01,2024-03-30,750.07,hour,575.3
+Cloud SQL,Storage: SSD,2024-03-01,2024-03-30,959.61,gibibyte month,163.13
+Cloud SQL,Automated Backup storage,2024-03-01,2024-03-30,788.43,gibibyte month,108.8
+Memorystore,Redis Standard M5 running,2024-03-01,2024-03-30,772.88,hour,365.57
+Memorystore,Redis Standard M4 running,2024-03-01,2024-03-30,742.26,hour,228.62
+Cloud Storage,Standard Storage US Multi-region,2024-03-01,2024-03-30,6544.42,gibibyte month,170.15
+Cloud Storage,Download Egress Americas,2024-03-01,2024-03-30,511.08,gibibyte,61.33
+Cloud Run,CPU Allocation Time,2024-03-01,2024-03-30,15148489.95,vcpu-second,363.56
+Cloud Run,Memory Allocation Time,2024-03-01,2024-03-30,21158397.93,gibibyte-second,52.9
+Cloud Functions,CPU Time,2024-03-01,2024-03-30,2438253.09,GHz-second,24.38
+Cloud Functions,Invocations,2024-03-01,2024-03-30,15629773.78,count,6.25
+BigQuery,Analysis Bytes Processed,2024-03-01,2024-03-30,118.0,tebibyte,590.02
+Networking,Network Egress via Carrier Peering,2024-03-01,2024-03-30,2828.39,gibibyte,240.41
+Networking,Network Inter Region Egress,2024-03-01,2024-03-30,5132.95,gibibyte,61.6
+Cloud Pub/Sub,Message Delivery Basic,2024-03-01,2024-03-30,2900.96,mebibyte,116.04
+Compute Engine,N1 HighMem-8 running in Americas,2024-04-01,2024-04-30,762.97,hour,814.85
+Compute Engine,N1 HighMem-8 running in Americas,2024-04-01,2024-04-30,713.77,hour,762.3
+Compute Engine,N1 Standard-8 running in Americas,2024-04-01,2024-04-30,743.62,hour,570.35
+Compute Engine,N1 Standard-8 running in Americas,2024-04-01,2024-04-30,720.86,hour,552.9
+Compute Engine,N1 Standard-16 running in Americas,2024-04-01,2024-04-30,766.31,hour,1175.53
+Compute Engine,N1 Standard-8 running in Americas,2024-04-01,2024-04-30,726.4,hour,557.15
+Compute Engine,SSD backed PD capacity,2024-04-01,2024-04-30,2526.64,gibibyte month,151.6
+Compute Engine,N1 Standard-4 with GPU running,2024-04-01,2024-04-30,707.8,hour,620.74
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-04-01,2024-04-30,735.38,hour,1067.77
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-04-01,2024-04-30,709.22,hour,543.97
+Cloud SQL,Storage: SSD,2024-04-01,2024-04-30,1010.15,gibibyte month,171.73
+Cloud SQL,Automated Backup storage,2024-04-01,2024-04-30,838.19,gibibyte month,115.67
+Memorystore,Redis Standard M5 running,2024-04-01,2024-04-30,721.19,hour,341.12
+Memorystore,Redis Standard M4 running,2024-04-01,2024-04-30,705.41,hour,217.27
+Cloud Storage,Standard Storage US Multi-region,2024-04-01,2024-04-30,6888.08,gibibyte month,179.09
+Cloud Storage,Download Egress Americas,2024-04-01,2024-04-30,500.57,gibibyte,60.07
+Cloud Run,CPU Allocation Time,2024-04-01,2024-04-30,3418186.83,vcpu-second,82.04
+Cloud Run,Memory Allocation Time,2024-04-01,2024-04-30,4102523.18,gibibyte-second,10.26
+Cloud Functions,CPU Time,2024-04-01,2024-04-30,1623355.31,GHz-second,16.23
+Cloud Functions,Invocations,2024-04-01,2024-04-30,73675989.07,count,29.47
+BigQuery,Analysis Bytes Processed,2024-04-01,2024-04-30,148.99,tebibyte,744.93
+Networking,Network Egress via Carrier Peering,2024-04-01,2024-04-30,3075.46,gibibyte,261.41
+Networking,Network Inter Region Egress,2024-04-01,2024-04-30,4690.58,gibibyte,56.29
+Cloud Pub/Sub,Message Delivery Basic,2024-04-01,2024-04-30,2234.42,mebibyte,89.38
+Compute Engine,N1 HighMem-8 running in Americas,2024-05-01,2024-05-30,773.46,hour,826.06
+Compute Engine,N1 HighMem-8 running in Americas,2024-05-01,2024-05-30,732.55,hour,782.36
+Compute Engine,N1 Standard-8 running in Americas,2024-05-01,2024-05-30,771.27,hour,591.56
+Compute Engine,N1 Standard-8 running in Americas,2024-05-01,2024-05-30,761.6,hour,584.15
+Compute Engine,N1 Standard-16 running in Americas,2024-05-01,2024-05-30,687.21,hour,1054.17
+Compute Engine,N1 Standard-8 running in Americas,2024-05-01,2024-05-30,749.34,hour,574.74
+Compute Engine,SSD backed PD capacity,2024-05-01,2024-05-30,2656.69,gibibyte month,159.4
+Compute Engine,N1 Standard-4 with GPU running,2024-05-01,2024-05-30,733.24,hour,643.05
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-05-01,2024-05-30,709.57,hour,1030.3
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-05-01,2024-05-30,742.35,hour,569.38
+Cloud SQL,Storage: SSD,2024-05-01,2024-05-30,953.39,gibibyte month,162.08
+Cloud SQL,Automated Backup storage,2024-05-01,2024-05-30,793.74,gibibyte month,109.54
+Memorystore,Redis Standard M5 running,2024-05-01,2024-05-30,725.95,hour,343.37
+Memorystore,Redis Standard M4 running,2024-05-01,2024-05-30,769.75,hour,237.08
+Cloud Storage,Standard Storage US Multi-region,2024-05-01,2024-05-30,6793.17,gibibyte month,176.62
+Cloud Storage,Download Egress Americas,2024-05-01,2024-05-30,485.8,gibibyte,58.3
+Cloud Run,CPU Allocation Time,2024-05-01,2024-05-30,9809143.36,vcpu-second,235.42
+Cloud Run,Memory Allocation Time,2024-05-01,2024-05-30,7180454.0,gibibyte-second,17.95
+Cloud Functions,CPU Time,2024-05-01,2024-05-30,7103685.0,GHz-second,71.04
+Cloud Functions,Invocations,2024-05-01,2024-05-30,97375560.56,count,38.95
+BigQuery,Analysis Bytes Processed,2024-05-01,2024-05-30,116.9,tebibyte,584.49
+Networking,Network Egress via Carrier Peering,2024-05-01,2024-05-30,3422.32,gibibyte,290.9
+Networking,Network Inter Region Egress,2024-05-01,2024-05-30,6326.91,gibibyte,75.92
+Cloud Pub/Sub,Message Delivery Basic,2024-05-01,2024-05-30,1962.75,mebibyte,78.51
+Compute Engine,N1 HighMem-8 running in Americas,2024-06-01,2024-06-30,753.0,hour,804.2
+Compute Engine,N1 HighMem-8 running in Americas,2024-06-01,2024-06-30,733.45,hour,783.32
+Compute Engine,N1 Standard-8 running in Americas,2024-06-01,2024-06-30,754.41,hour,578.63
+Compute Engine,N1 Standard-8 running in Americas,2024-06-01,2024-06-30,732.66,hour,561.95
+Compute Engine,N1 Standard-16 running in Americas,2024-06-01,2024-06-30,686.25,hour,1052.71
+Compute Engine,N1 Standard-8 running in Americas,2024-06-01,2024-06-30,714.6,hour,548.1
+Compute Engine,SSD backed PD capacity,2024-06-01,2024-06-30,2450.08,gibibyte month,147.0
+Compute Engine,N1 Standard-4 with GPU running,2024-06-01,2024-06-30,767.59,hour,673.18
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-06-01,2024-06-30,763.18,hour,1108.13
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-06-01,2024-06-30,759.05,hour,582.19
+Cloud SQL,Storage: SSD,2024-06-01,2024-06-30,976.9,gibibyte month,166.07
+Cloud SQL,Automated Backup storage,2024-06-01,2024-06-30,757.56,gibibyte month,104.54
+Memorystore,Redis Standard M5 running,2024-06-01,2024-06-30,763.11,hour,360.95
+Memorystore,Redis Standard M4 running,2024-06-01,2024-06-30,769.15,hour,236.9
+Cloud Storage,Standard Storage US Multi-region,2024-06-01,2024-06-30,6176.81,gibibyte month,160.6
+Cloud Storage,Download Egress Americas,2024-06-01,2024-06-30,499.16,gibibyte,59.9
+Cloud Run,CPU Allocation Time,2024-06-01,2024-06-30,3079715.29,vcpu-second,73.91
+Cloud Run,Memory Allocation Time,2024-06-01,2024-06-30,20798090.67,gibibyte-second,52.0
+Cloud Functions,CPU Time,2024-06-01,2024-06-30,6101819.98,GHz-second,61.02
+Cloud Functions,Invocations,2024-06-01,2024-06-30,25018167.79,count,10.01
+BigQuery,Analysis Bytes Processed,2024-06-01,2024-06-30,128.39,tebibyte,641.97
+Networking,Network Egress via Carrier Peering,2024-06-01,2024-06-30,3279.69,gibibyte,278.77
+Networking,Network Inter Region Egress,2024-06-01,2024-06-30,5295.17,gibibyte,63.54
+Cloud Pub/Sub,Message Delivery Basic,2024-06-01,2024-06-30,2817.26,mebibyte,112.69
+Compute Engine,N1 HighMem-8 running in Americas,2024-07-01,2024-07-30,723.27,hour,772.45
+Compute Engine,N1 HighMem-8 running in Americas,2024-07-01,2024-07-30,704.75,hour,752.68
+Compute Engine,N1 Standard-8 running in Americas,2024-07-01,2024-07-30,733.44,hour,562.55
+Compute Engine,N1 Standard-8 running in Americas,2024-07-01,2024-07-30,750.14,hour,575.36
+Compute Engine,N1 Standard-16 running in Americas,2024-07-01,2024-07-30,703.82,hour,1079.66
+Compute Engine,N1 Standard-8 running in Americas,2024-07-01,2024-07-30,713.51,hour,547.26
+Compute Engine,SSD backed PD capacity,2024-07-01,2024-07-30,2754.49,gibibyte month,165.27
+Compute Engine,N1 Standard-4 with GPU running,2024-07-01,2024-07-30,743.13,hour,651.72
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-07-01,2024-07-30,724.58,hour,1052.09
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-07-01,2024-07-30,731.54,hour,561.09
+Cloud SQL,Storage: SSD,2024-07-01,2024-07-30,954.52,gibibyte month,162.27
+Cloud SQL,Automated Backup storage,2024-07-01,2024-07-30,773.57,gibibyte month,106.75
+Memorystore,Redis Standard M5 running,2024-07-01,2024-07-30,715.82,hour,338.58
+Memorystore,Redis Standard M4 running,2024-07-01,2024-07-30,737.74,hour,227.22
+Cloud Storage,Standard Storage US Multi-region,2024-07-01,2024-07-30,6289.49,gibibyte month,163.53
+Cloud Storage,Download Egress Americas,2024-07-01,2024-07-30,483.21,gibibyte,57.99
+Cloud Run,CPU Allocation Time,2024-07-01,2024-07-30,3107492.14,vcpu-second,74.58
+Cloud Run,Memory Allocation Time,2024-07-01,2024-07-30,17767809.2,gibibyte-second,44.42
+Cloud Functions,CPU Time,2024-07-01,2024-07-30,2437527.67,GHz-second,24.38
+Cloud Functions,Invocations,2024-07-01,2024-07-30,100778451.27,count,40.31
+BigQuery,Analysis Bytes Processed,2024-07-01,2024-07-30,153.38,tebibyte,766.88
+Networking,Network Egress via Carrier Peering,2024-07-01,2024-07-30,2513.37,gibibyte,213.64
+Networking,Network Inter Region Egress,2024-07-01,2024-07-30,5214.01,gibibyte,62.57
+Cloud Pub/Sub,Message Delivery Basic,2024-07-01,2024-07-30,2575.66,mebibyte,103.03
+Compute Engine,N1 HighMem-8 running in Americas,2024-08-01,2024-08-30,704.97,hour,752.9
+Compute Engine,N1 HighMem-8 running in Americas,2024-08-01,2024-08-30,697.79,hour,745.24
+Compute Engine,N1 Standard-8 running in Americas,2024-08-01,2024-08-30,768.15,hour,589.17
+Compute Engine,N1 Standard-8 running in Americas,2024-08-01,2024-08-30,736.22,hour,564.68
+Compute Engine,N1 Standard-16 running in Americas,2024-08-01,2024-08-30,727.61,hour,1116.15
+Compute Engine,N1 Standard-8 running in Americas,2024-08-01,2024-08-30,754.93,hour,579.03
+Compute Engine,SSD backed PD capacity,2024-08-01,2024-08-30,2695.94,gibibyte month,161.76
+Compute Engine,N1 Standard-4 with GPU running,2024-08-01,2024-08-30,702.88,hour,616.43
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-08-01,2024-08-30,694.69,hour,1008.69
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-08-01,2024-08-30,723.96,hour,555.28
+Cloud SQL,Storage: SSD,2024-08-01,2024-08-30,990.83,gibibyte month,168.44
+Cloud SQL,Automated Backup storage,2024-08-01,2024-08-30,796.83,gibibyte month,109.96
+Memorystore,Redis Standard M5 running,2024-08-01,2024-08-30,750.07,hour,354.78
+Memorystore,Redis Standard M4 running,2024-08-01,2024-08-30,745.19,hour,229.52
+Cloud Storage,Standard Storage US Multi-region,2024-08-01,2024-08-30,6877.65,gibibyte month,178.82
+Cloud Storage,Download Egress Americas,2024-08-01,2024-08-30,475.91,gibibyte,57.11
+Cloud Run,CPU Allocation Time,2024-08-01,2024-08-30,8280892.0,vcpu-second,198.74
+Cloud Run,Memory Allocation Time,2024-08-01,2024-08-30,10939680.97,gibibyte-second,27.35
+Cloud Functions,CPU Time,2024-08-01,2024-08-30,6755915.06,GHz-second,67.56
+Cloud Functions,Invocations,2024-08-01,2024-08-30,36743992.56,count,14.7
+BigQuery,Analysis Bytes Processed,2024-08-01,2024-08-30,109.86,tebibyte,549.32
+Networking,Network Egress via Carrier Peering,2024-08-01,2024-08-30,3117.78,gibibyte,265.01
+Networking,Network Inter Region Egress,2024-08-01,2024-08-30,5765.64,gibibyte,69.19
+Cloud Pub/Sub,Message Delivery Basic,2024-08-01,2024-08-30,2112.02,mebibyte,84.48
+Compute Engine,N1 HighMem-8 running in Americas,2024-09-01,2024-09-30,708.08,hour,756.23
+Compute Engine,N1 HighMem-8 running in Americas,2024-09-01,2024-09-30,767.08,hour,819.24
+Compute Engine,N1 Standard-8 running in Americas,2024-09-01,2024-09-30,725.02,hour,556.09
+Compute Engine,N1 Standard-8 running in Americas,2024-09-01,2024-09-30,761.65,hour,584.19
+Compute Engine,N1 Standard-16 running in Americas,2024-09-01,2024-09-30,734.41,hour,1126.58
+Compute Engine,N1 Standard-8 running in Americas,2024-09-01,2024-09-30,690.63,hour,529.71
+Compute Engine,SSD backed PD capacity,2024-09-01,2024-09-30,2755.78,gibibyte month,165.35
+Compute Engine,N1 Standard-4 with GPU running,2024-09-01,2024-09-30,759.44,hour,666.03
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-09-01,2024-09-30,771.08,hour,1119.61
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-09-01,2024-09-30,767.35,hour,588.56
+Cloud SQL,Storage: SSD,2024-09-01,2024-09-30,1041.84,gibibyte month,177.11
+Cloud SQL,Automated Backup storage,2024-09-01,2024-09-30,767.97,gibibyte month,105.98
+Memorystore,Redis Standard M5 running,2024-09-01,2024-09-30,728.74,hour,344.7
+Memorystore,Redis Standard M4 running,2024-09-01,2024-09-30,704.92,hour,217.12
+Cloud Storage,Standard Storage US Multi-region,2024-09-01,2024-09-30,6422.81,gibibyte month,166.99
+Cloud Storage,Download Egress Americas,2024-09-01,2024-09-30,473.52,gibibyte,56.82
+Cloud Run,CPU Allocation Time,2024-09-01,2024-09-30,7911980.66,vcpu-second,189.89
+Cloud Run,Memory Allocation Time,2024-09-01,2024-09-30,26056226.94,gibibyte-second,65.14
+Cloud Functions,CPU Time,2024-09-01,2024-09-30,2685010.87,GHz-second,26.85
+Cloud Functions,Invocations,2024-09-01,2024-09-30,88946883.69,count,35.58
+BigQuery,Analysis Bytes Processed,2024-09-01,2024-09-30,127.08,tebibyte,635.38
+Networking,Network Egress via Carrier Peering,2024-09-01,2024-09-30,3076.81,gibibyte,261.53
+Networking,Network Inter Region Egress,2024-09-01,2024-09-30,7371.95,gibibyte,88.46
+Cloud Pub/Sub,Message Delivery Basic,2024-09-01,2024-09-30,2963.31,mebibyte,118.53
+Compute Engine,N1 HighMem-8 running in Americas,2024-10-01,2024-10-30,734.89,hour,784.86
+Compute Engine,N1 HighMem-8 running in Americas,2024-10-01,2024-10-30,749.13,hour,800.07
+Compute Engine,N1 Standard-8 running in Americas,2024-10-01,2024-10-30,699.76,hour,536.72
+Compute Engine,N1 Standard-8 running in Americas,2024-10-01,2024-10-30,712.19,hour,546.25
+Compute Engine,N1 Standard-16 running in Americas,2024-10-01,2024-10-30,771.06,hour,1182.8
+Compute Engine,N1 Standard-8 running in Americas,2024-10-01,2024-10-30,736.94,hour,565.23
+Compute Engine,SSD backed PD capacity,2024-10-01,2024-10-30,2613.16,gibibyte month,156.79
+Compute Engine,N1 Standard-4 with GPU running,2024-10-01,2024-10-30,751.72,hour,659.26
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-10-01,2024-10-30,691.21,hour,1003.63
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-10-01,2024-10-30,737.37,hour,565.57
+Cloud SQL,Storage: SSD,2024-10-01,2024-10-30,1000.34,gibibyte month,170.06
+Cloud SQL,Automated Backup storage,2024-10-01,2024-10-30,833.86,gibibyte month,115.07
+Memorystore,Redis Standard M5 running,2024-10-01,2024-10-30,699.99,hour,331.1
+Memorystore,Redis Standard M4 running,2024-10-01,2024-10-30,770.36,hour,237.27
+Cloud Storage,Standard Storage US Multi-region,2024-10-01,2024-10-30,6172.49,gibibyte month,160.48
+Cloud Storage,Download Egress Americas,2024-10-01,2024-10-30,481.15,gibibyte,57.74
+Cloud Run,CPU Allocation Time,2024-10-01,2024-10-30,11282547.66,vcpu-second,270.78
+Cloud Run,Memory Allocation Time,2024-10-01,2024-10-30,18799973.75,gibibyte-second,47.0
+Cloud Functions,CPU Time,2024-10-01,2024-10-30,2480266.58,GHz-second,24.8
+Cloud Functions,Invocations,2024-10-01,2024-10-30,24188944.86,count,9.68
+BigQuery,Analysis Bytes Processed,2024-10-01,2024-10-30,155.37,tebibyte,776.84
+Networking,Network Egress via Carrier Peering,2024-10-01,2024-10-30,2793.94,gibibyte,237.49
+Networking,Network Inter Region Egress,2024-10-01,2024-10-30,6283.56,gibibyte,75.4
+Cloud Pub/Sub,Message Delivery Basic,2024-10-01,2024-10-30,2516.77,mebibyte,100.67
+Compute Engine,N1 HighMem-8 running in Americas,2024-11-01,2024-11-30,722.92,hour,772.08
+Compute Engine,N1 HighMem-8 running in Americas,2024-11-01,2024-11-30,737.33,hour,787.47
+Compute Engine,N1 Standard-8 running in Americas,2024-11-01,2024-11-30,732.0,hour,561.44
+Compute Engine,N1 Standard-8 running in Americas,2024-11-01,2024-11-30,768.08,hour,589.12
+Compute Engine,N1 Standard-16 running in Americas,2024-11-01,2024-11-30,704.09,hour,1080.08
+Compute Engine,N1 Standard-8 running in Americas,2024-11-01,2024-11-30,748.94,hour,574.44
+Compute Engine,SSD backed PD capacity,2024-11-01,2024-11-30,2518.47,gibibyte month,151.11
+Compute Engine,N1 Standard-4 with GPU running,2024-11-01,2024-11-30,720.87,hour,632.2
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-11-01,2024-11-30,745.04,hour,1081.8
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-11-01,2024-11-30,712.48,hour,546.47
+Cloud SQL,Storage: SSD,2024-11-01,2024-11-30,977.94,gibibyte month,166.25
+Cloud SQL,Automated Backup storage,2024-11-01,2024-11-30,824.18,gibibyte month,113.74
+Memorystore,Redis Standard M5 running,2024-11-01,2024-11-30,692.55,hour,327.58
+Memorystore,Redis Standard M4 running,2024-11-01,2024-11-30,726.35,hour,223.71
+Cloud Storage,Standard Storage US Multi-region,2024-11-01,2024-11-30,6888.79,gibibyte month,179.11
+Cloud Storage,Download Egress Americas,2024-11-01,2024-11-30,529.77,gibibyte,63.57
+Cloud Run,CPU Allocation Time,2024-11-01,2024-11-30,3142867.25,vcpu-second,75.43
+Cloud Run,Memory Allocation Time,2024-11-01,2024-11-30,7987810.91,gibibyte-second,19.97
+Cloud Functions,CPU Time,2024-11-01,2024-11-30,2684992.83,GHz-second,26.85
+Cloud Functions,Invocations,2024-11-01,2024-11-30,103492789.35,count,41.4
+BigQuery,Analysis Bytes Processed,2024-11-01,2024-11-30,154.76,tebibyte,773.78
+Networking,Network Egress via Carrier Peering,2024-11-01,2024-11-30,3806.83,gibibyte,323.58
+Networking,Network Inter Region Egress,2024-11-01,2024-11-30,5608.58,gibibyte,67.3
+Cloud Pub/Sub,Message Delivery Basic,2024-11-01,2024-11-30,1968.57,mebibyte,78.74
+Compute Engine,N1 HighMem-8 running in Americas,2024-12-01,2024-12-30,759.24,hour,810.86
+Compute Engine,N1 HighMem-8 running in Americas,2024-12-01,2024-12-30,747.83,hour,798.68
+Compute Engine,N1 Standard-8 running in Americas,2024-12-01,2024-12-30,739.78,hour,567.41
+Compute Engine,N1 Standard-8 running in Americas,2024-12-01,2024-12-30,772.68,hour,592.65
+Compute Engine,N1 Standard-16 running in Americas,2024-12-01,2024-12-30,743.49,hour,1140.51
+Compute Engine,N1 Standard-8 running in Americas,2024-12-01,2024-12-30,686.89,hour,526.84
+Compute Engine,SSD backed PD capacity,2024-12-01,2024-12-30,2698.94,gibibyte month,161.94
+Compute Engine,N1 Standard-4 with GPU running,2024-12-01,2024-12-30,712.43,hour,624.8
+Cloud SQL,PostgreSQL: N1 Standard 4 HA,2024-12-01,2024-12-30,744.31,hour,1080.74
+Cloud SQL,PostgreSQL: N1 Standard 2 Read Replica,2024-12-01,2024-12-30,768.45,hour,589.4
+Cloud SQL,Storage: SSD,2024-12-01,2024-12-30,956.11,gibibyte month,162.54
+Cloud SQL,Automated Backup storage,2024-12-01,2024-12-30,763.08,gibibyte month,105.31
+Memorystore,Redis Standard M5 running,2024-12-01,2024-12-30,695.58,hour,329.01
+Memorystore,Redis Standard M4 running,2024-12-01,2024-12-30,734.66,hour,226.28
+Cloud Storage,Standard Storage US Multi-region,2024-12-01,2024-12-30,6322.43,gibibyte month,164.38
+Cloud Storage,Download Egress Americas,2024-12-01,2024-12-30,506.29,gibibyte,60.75
+Cloud Run,CPU Allocation Time,2024-12-01,2024-12-30,13194750.12,vcpu-second,316.67
+Cloud Run,Memory Allocation Time,2024-12-01,2024-12-30,7764177.11,gibibyte-second,19.41
+Cloud Functions,CPU Time,2024-12-01,2024-12-30,5203674.07,GHz-second,52.04
+Cloud Functions,Invocations,2024-12-01,2024-12-30,38238430.41,count,15.3
+BigQuery,Analysis Bytes Processed,2024-12-01,2024-12-30,129.25,tebibyte,646.27
+Networking,Network Egress via Carrier Peering,2024-12-01,2024-12-30,3848.54,gibibyte,327.13
+Networking,Network Inter Region Egress,2024-12-01,2024-12-30,7038.31,gibibyte,84.46
+Cloud Pub/Sub,Message Delivery Basic,2024-12-01,2024-12-30,1890.85,mebibyte,75.63
