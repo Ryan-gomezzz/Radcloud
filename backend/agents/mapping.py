@@ -19,7 +19,7 @@ def _cfg_summary(cfg: dict) -> str:
     return ", ".join(parts)[:120]
 
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     inv = context.get("gcp_inventory") or []
     rows = []
     for r in inv:

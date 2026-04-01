@@ -1,6 +1,6 @@
 """Risk agent — stub: migration risks + summary."""
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     context["risks"] = [
         {
             "id": "RISK-001",

@@ -16,14 +16,6 @@ from fastapi.responses import StreamingResponse
 
 from agents import discovery, finops, mapping, risk, watchdog
 
-try:
-    import anthropic
-
-    _api_key = os.environ.get("ANTHROPIC_API_KEY")
-    claude_client = anthropic.Anthropic(api_key=_api_key) if _api_key else None
-except ImportError:
-    claude_client = None
-
 app = FastAPI(title="RADCloud API")
 app.add_middleware(
     CORSMiddleware,
@@ -64,7 +56,7 @@ async def _run_pipeline(context: dict) -> dict:
     for agent_name, agent_fn in PIPELINE:
         context["status"] = agent_name
         try:
-            context = await agent_fn(context, claude_client)
+            context = await agent_fn(context)
         except Exception as e:
             context.setdefault("errors", []).append({"agent": agent_name, "error": str(e)})
     context["status"] = "complete"
@@ -135,7 +127,7 @@ async def analyze_stream(
         for agent_name, agent_fn in PIPELINE:
             yield f"data: {json.dumps({'status': agent_name, 'message': f'Running {agent_name} agent...'})}\n\n"
             try:
-                context = await agent_fn(context, claude_client)
+                context = await agent_fn(context)
             except Exception as e:
                 context.setdefault("errors", []).append({"agent": agent_name, "error": str(e)})
             yield f"data: {json.dumps({'status': agent_name, 'message': f'{agent_name} complete', 'partial': context})}\n\n"

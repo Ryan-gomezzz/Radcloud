@@ -82,7 +82,7 @@ output "db_endpoint" {
 """
 
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     context["runbook"] = {
         "title": "GCP to AWS Migration Runbook — NovaPay",
         "estimated_total_duration": "8-12 weeks",

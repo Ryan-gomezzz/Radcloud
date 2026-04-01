@@ -1,6 +1,6 @@
 """FinOps agent — stub: Day-0 cost optimization narrative."""
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     context["finops"] = {
         "gcp_monthly_total": 9840.00,
         "aws_monthly_ondemand": 10320.00,

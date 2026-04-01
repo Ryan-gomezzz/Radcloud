@@ -17,7 +17,7 @@ async def main() -> None:
         "errors": [],
     }
     for mod in (discovery, mapping, risk, finops, watchdog):
-        ctx = await mod.run(ctx, None)
+        ctx = await mod.run(ctx)
     ctx["status"] = "complete"
     out = pathlib.Path(__file__).resolve().parent.parent / "data" / "cached_response.json"
     out.parent.mkdir(parents=True, exist_ok=True)

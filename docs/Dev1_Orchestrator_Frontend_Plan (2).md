@@ -3,7 +3,7 @@
 **Project:** RADCloud  
 **Role:** Orchestrator + Frontend  
 **Time Budget:** 24 hours  
-**Stack:** React (Vite + Tailwind), Python (FastAPI), Claude API (claude-sonnet-4-20250514)
+**Stack:** React (Vite + Tailwind), Python (FastAPI), AWS Bedrock — Anthropic Claude (see `backend/llm.py`, `backend/config.py`)
 
 ---
 
@@ -66,9 +66,9 @@ This hour is shared with the full team. Do not skip it.
   - `runbook`
   - `watchdog`
   - `iac_bundle`
-- Agree on the agent interface contract: every agent is an async function with this signature:
+- Agree on the agent interface contract: every agent is an async function with this signature (LLM calls use `backend/llm.py` — Bedrock — internally):
   ```python
-  async def run(context: dict, claude_client) -> dict:
+  async def run(context: dict) -> dict:
       # reads what it needs from context
       # writes its output back to context
       # returns the updated context
@@ -134,7 +134,7 @@ async def analyze(
     for agent_name, agent_fn in pipeline:
         context["status"] = agent_name
         try:
-            context = await agent_fn(context, claude_client)
+            context = await agent_fn(context)
         except Exception as e:
             context["errors"].append({
                 "agent": agent_name,
@@ -146,15 +146,9 @@ async def analyze(
     return context
 ```
 
-**Step 3 — Claude API client setup**
+**Step 3 — AWS Bedrock (Claude) via `llm.py`**
 
-```python
-import anthropic
-
-claude_client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-```
-
-Pass this client to every agent so they can make Claude calls.
+Agents call `call_llm_async()` from `backend/llm.py` (boto3 `bedrock-runtime` `invoke_model`). Model ID and region live in `backend/config.py` (`BEDROCK_MODEL_ID`, `AWS_DEFAULT_REGION`). No client is passed into `run()` — credentials use the standard AWS chain.
 
 **Step 4 — Stub agents for testing**
 
@@ -162,7 +156,7 @@ Write stubs for all 5 agents that return hardcoded sample data. This lets you te
 
 ```python
 # agents/discovery.py (stub)
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     context["gcp_inventory"] = [
         {"type": "compute_instance", "name": "web-server-1", "machine_type": "n1-standard-4", "region": "us-central1"},
         {"type": "cloud_sql", "name": "main-db", "tier": "db-n1-standard-2", "region": "us-central1"},
@@ -193,7 +187,7 @@ async def analyze_stream(
         # ... same pipeline but yield SSE events between agents
         for agent_name, agent_fn in pipeline:
             yield f"data: {json.dumps({'status': agent_name, 'message': f'Running {agent_name} agent...'})}\n\n"
-            context = await agent_fn(context, claude_client)
+            context = await agent_fn(context)
             yield f"data: {json.dumps({'status': agent_name, 'message': f'{agent_name} complete', 'partial': context})}\n\n"
         yield f"data: {json.dumps({'status': 'complete', 'result': context})}\n\n"
 

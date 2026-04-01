@@ -1,6 +1,6 @@
 """Discovery agent — stub: NovaPay GCP inventory."""
 
-async def run(context: dict, claude_client) -> dict:
+async def run(context: dict) -> dict:
     context["gcp_inventory"] = [
         {
             "resource_id": "web-server-1",
