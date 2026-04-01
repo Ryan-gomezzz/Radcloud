@@ -137,8 +137,15 @@ async def chat(request: Request):
     The backend calls Bedrock with a system prompt that guides the onboarding.
     Returns the AI's next message + any extracted structured data.
     """
-    body = await request.json()
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    if not isinstance(body, dict):
+        body = {}
     messages = body.get("messages", [])
+    if not isinstance(messages, list):
+        messages = []
 
     if _demo_mode_enabled():
         user_msgs = [m for m in messages if m.get("role") == "user" and str(m.get("content", "")).strip()]

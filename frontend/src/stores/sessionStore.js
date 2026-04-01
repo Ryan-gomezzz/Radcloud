@@ -20,6 +20,7 @@ export const useSessionStore = create((set, get) => ({
           "Content-Type": "application/json",
           ...authHeaders(),
         },
+        body: JSON.stringify({}),
       });
       if (!res.ok) return null;
       const data = await res.json();
