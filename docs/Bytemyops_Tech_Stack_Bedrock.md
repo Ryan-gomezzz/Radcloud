@@ -1,5 +1,7 @@
 # Marketing site copy — Tech stack (Bedrock)
 
+The RADCloud application codebase invokes **Anthropic Claude exclusively via AWS Bedrock** (`backend/llm.py`); this page aligns the public site with that architecture.
+
 Use this on **https://bytemyops.ahadullabaig.in/** (or the RADCloud marketing site) in the Tech Stack section.
 
 ## Replace the old “Claude API” card

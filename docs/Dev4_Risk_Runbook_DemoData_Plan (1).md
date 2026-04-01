@@ -7,6 +7,8 @@
 **Dependencies inbound:** `gcp_inventory` and `aws_mapping` from Dev 2 (available after hour 8). You can build risk templates and the runbook structure independently before then.  
 **Dependencies outbound:** Dev 1 (Frontend) renders your risk report, runbook, watchdog, and IaC tabs. Dev 3 (FinOps) uses your sample billing CSV. Everyone uses your sample Terraform for the demo.
 
+> **LLM inference (platform standard):** Risk, runbook, and Watchdog LLM steps use **Claude on Amazon Bedrock** only. Implement via `backend/llm.py` (`call_llm_async`); model ID in `backend/config.py`. Agent signature: `async def run(context: dict) -> dict`. Example code using `claude_client` in this document should be translated to Bedrock calls consistent with `llm.py`.
+
 ---
 
 ## Your Responsibility in One Line
@@ -819,7 +821,7 @@ Catch the obvious risks without needing Claude:
 # agents/risk_rules.py
 
 def detect_deterministic_risks(gcp_inventory: list, aws_mapping: list) -> list:
-    """Detect risks from mapping data without calling Claude."""
+    """Detect risks from mapping data without calling Bedrock/Claude."""
     risks = []
     risk_counter = 1
 
@@ -924,9 +926,9 @@ def detect_deterministic_risks(gcp_inventory: list, aws_mapping: list) -> list:
     return risks, risk_counter
 ```
 
-**Step 3 — Claude-powered deep risk analysis**
+**Step 3 — Claude-on-Bedrock deep risk analysis**
 
-Use Claude to find the subtle risks that rules can't catch:
+Use Claude via Bedrock to find the subtle risks that rules can't catch:
 
 ```python
 # agents/risk.py
@@ -965,7 +967,7 @@ async def run(context: dict, claude_client) -> dict:
     # Phase 1: Deterministic risks
     auto_risks, next_counter = detect_deterministic_risks(inventory, mapping)
 
-    # Phase 2: Claude-powered deep analysis
+    # Phase 2: Claude-on-Bedrock deep analysis
     try:
         response = claude_client.messages.create(
             model="claude-sonnet-4-20250514",
@@ -1238,7 +1240,7 @@ At minimum, generate stubs for:
   - **Watchdog tab:** "Watchdog is the fifth agent. It takes the migration plan and turns it into an operating model: anomaly detection, optimization opportunities, remediation flow, and post-cutover cost guardrails from Day 0."
   - **IaC Output tab:** "These Terraform artifacts are generated scaffolds, not blind one-click production applies. RADCloud accelerates the build-out, then engineers review and harden before deployment."
 - Prepare for judge questions:
-  - "How do you know these risks are real?" → "The deterministic rules catch known incompatibilities — IAM model differences, firewall-to-security-group translation, partial service mappings. Claude adds contextual risks like pipeline rearchitecting that rules can't detect."
+  - "How do you know these risks are real?" → "The deterministic rules catch known incompatibilities — IAM model differences, firewall-to-security-group translation, partial service mappings. Claude on Bedrock adds contextual risks like pipeline rearchitecting that rules can't detect."
   - "How detailed is the runbook?" → "Each step has an owner, time estimate, dependencies, and a specific rollback procedure. It's a starting point, not a finished project plan — but it gives migration teams a 70% head start."
 
 ### Hours 20–24: Buffer
