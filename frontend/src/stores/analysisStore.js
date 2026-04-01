@@ -7,6 +7,7 @@ export const PIPELINE_AGENTS = [
   "risk",
   "finops",
   "watchdog",
+  "planner",
 ];
 
 export const useAnalysisStore = create((set, get) => ({
@@ -56,6 +57,14 @@ export const useAnalysisStore = create((set, get) => ({
     set({ analysisStatus: "running" });
     try {
       const data = await analyzeInfrastructure(formData);
+      try {
+        const pid = data?.migration_plan?.plan_id;
+        if (pid) {
+          sessionStorage.setItem(`radcloud_plan_${pid}`, JSON.stringify(data.migration_plan));
+        }
+      } catch {
+        /* ignore */
+      }
       set({
         results: data,
         analysisStatus: "complete",

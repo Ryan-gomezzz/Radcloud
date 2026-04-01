@@ -14,18 +14,24 @@ export function SignupPage() {
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const signup = useAuthStore((s) => s.signup);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    signup(
-      name || "User",
-      email || "user@example.com",
-      password,
-      company || "Company"
-    );
-    navigate("/app/onboarding", { replace: true });
+    setError("");
+    try {
+      await signup(
+        name || "User",
+        email || "user@example.com",
+        password || "changeme",
+        company || "Company"
+      );
+      navigate("/app/onboarding", { replace: true });
+    } catch (err) {
+      setError(err?.message || "Could not create account");
+    }
   };
 
   return (
@@ -57,6 +63,11 @@ export function SignupPage() {
               One step before the guided onboarding flow.
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                  {error}
+                </p>
+              )}
               <div>
                 <label
                   htmlFor="name"

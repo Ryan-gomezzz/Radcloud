@@ -1,4 +1,11 @@
-"""Watchdog agent — stub: runbook, post-migration watchdog dashboard, IaC bundle."""
+"""Watchdog agent — LLM+RAG runbook, dashboard, IaC bundle; deterministic stub fallback."""
+from __future__ import annotations
+
+import json
+import logging
+import re
+
+logger = logging.getLogger(__name__)
 
 MAIN_TF = r"""# RADCloud Generated — AWS Infrastructure
 # Source: NovaPay GCP Migration
@@ -82,7 +89,27 @@ output "db_endpoint" {
 """
 
 
-async def run(context: dict) -> dict:
+def _parse_json(text: str) -> dict | None:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    match = re.search(r"```(?:json)?\s*(\{[\s\S]*?\})\s*```", text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group(1))
+        except json.JSONDecodeError:
+            pass
+    match = re.search(r"\{[\s\S]*\}", text)
+    if match:
+        try:
+            return json.loads(match.group(0))
+        except json.JSONDecodeError:
+            pass
+    return None
+
+
+def _apply_watchdog_stub(context: dict) -> dict:
     context["runbook"] = {
         "title": "GCP to AWS Migration Runbook — NovaPay",
         "estimated_total_duration": "8-12 weeks",
@@ -230,3 +257,91 @@ async def run(context: dict) -> dict:
         "deployment_notes": "Run `terraform init && terraform plan` to validate before applying. Review security groups and IAM roles manually — auto-generated policies may be overly permissive.",
     }
     return context
+
+
+def _iac_stub_files() -> list[dict]:
+    return [
+        {"filename": "main.tf", "language": "hcl", "content": MAIN_TF},
+        {"filename": "variables.tf", "language": "hcl", "content": VARIABLES_TF},
+        {"filename": "outputs.tf", "language": "hcl", "content": OUTPUTS_TF},
+    ]
+
+
+async def run(context: dict) -> dict:
+    from llm import call_llm_async
+    from rag.retriever import retrieve_for_agent
+
+    rag_ctx = retrieve_for_agent("watchdog", context)
+    inv = context.get("gcp_inventory") or []
+    risks = context.get("risks") or []
+    fin = context.get("finops") or {}
+
+    summary = json.dumps(
+        {
+            "resource_count": len(inv),
+            "risk_titles": [r.get("title") for r in risks[:6]],
+            "aws_monthly_optimized": fin.get("aws_monthly_optimized"),
+        },
+        indent=2,
+    )
+
+    system = """You are a post-migration watchdog and IaC architect for GCP→AWS migrations.
+Output ONLY valid JSON (no markdown). Include these top-level keys:
+{
+  "runbook": { "title": "...", "estimated_total_duration": "...", "phases": [...], "rollback_plan": "...", "success_criteria": [] },
+  "watchdog": {
+    "monthly_aws_spend": 0,
+    "savings_identified": 0,
+    "resources_optimized_pct": 0,
+    "active_agents": 0,
+    "spend_by_service": [{"service":"EC2","cost":0}],
+    "cost_trend": [{"month":"M1","traditional":0,"radcloud":0}],
+    "optimization_opportunities": [{"id":"OPT-1","impact":"high|medium|low","title":"","description":"","monthly_savings":0,"auto_fix":[],"confidence":90}],
+    "remediation_pipeline": {"detect":"","evaluate":"","apply":"","verify":""}
+  },
+  "iac_bundle": {
+    "files": [{"filename":"main.tf","language":"hcl","content":"..."}],
+    "assumptions": [],
+    "deployment_notes": ""
+  }
+}
+Phases must include numbered steps with action, responsible, estimated_hours, dependencies, rollback, notes.
+Provide realistic Terraform HCL in iac_bundle.files (at least main.tf skeleton)."""
+
+    if rag_ctx:
+        system += f"\n\n### Reference:\n{rag_ctx}"
+
+    user_msg = f"""Context summary:\n{summary}\n\nProduce runbook, watchdog dashboard JSON, and iac_bundle for this migration."""
+
+    try:
+        raw = await call_llm_async(
+            messages=[{"role": "user", "content": user_msg}],
+            system=system,
+            max_tokens=8192,
+            temperature=0.2,
+        )
+        parsed = _parse_json(raw or "")
+        if isinstance(parsed, dict):
+            rb = parsed.get("runbook")
+            wd = parsed.get("watchdog")
+            iac = parsed.get("iac_bundle")
+            if (
+                isinstance(rb, dict)
+                and rb.get("phases")
+                and isinstance(wd, dict)
+                and wd.get("spend_by_service")
+                and isinstance(iac, dict)
+            ):
+                files = iac.get("files")
+                if not isinstance(files, list) or not files:
+                    iac = {**iac, "files": _iac_stub_files()}
+                context["runbook"] = rb
+                context["watchdog"] = wd
+                context["iac_bundle"] = iac
+                logger.info("Watchdog: applied LLM runbook / dashboard / IaC")
+                return context
+        logger.warning("Watchdog: incomplete LLM output, using stub")
+    except Exception as e:
+        logger.warning("Watchdog LLM failed, using stub: %s", e)
+
+    return _apply_watchdog_stub(context)

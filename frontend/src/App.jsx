@@ -15,6 +15,9 @@ import { FinOpsView } from "./components/dashboard/FinOpsView";
 import { WatchdogView } from "./components/dashboard/WatchdogView";
 import { RunbookView } from "./components/dashboard/RunbookView";
 import { IaCOutputView } from "./components/dashboard/IaCOutputView";
+import { CredentialWizard } from "./components/credentials/CredentialWizard";
+import { PlanReviewPage } from "./components/plan/PlanReviewPage";
+import { ExecutionDashboard } from "./components/execution/ExecutionDashboard";
 
 function AuthHydrate({ children }) {
   const hydrate = useAuthStore((s) => s.hydrate);
@@ -52,6 +55,9 @@ export default function App() {
           >
             <Route index element={<Navigate to="onboarding" replace />} />
             <Route path="onboarding" element={<ChatOnboarding />} />
+            <Route path="credentials" element={<CredentialWizard />} />
+            <Route path="plan-review/:planId" element={<PlanReviewPage />} />
+            <Route path="execution" element={<ExecutionDashboard />} />
             <Route path="dashboard" element={<DashboardLayout />}>
               <Route index element={<OverviewView />} />
               <Route path="migration" element={<MigrationView />} />

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthStore } from "../../stores/authStore";
+import { useSessionStore } from "../../stores/sessionStore";
 import {
   useAnalysisStore,
   PIPELINE_AGENTS,
@@ -26,10 +27,12 @@ const AGENT_LABELS = {
   risk: "Risk",
   finops: "FinOps",
   watchdog: "Watchdog",
+  planner: "Planner",
 };
 
 export function ChatOnboarding() {
   const tts = useTTS();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { messages, state, sendMessage, busy: chatBusy } = useChat(tts);
   
   const [input, setInput] = useState("");
@@ -41,6 +44,17 @@ export function ChatOnboarding() {
   const setUseSampleBilling = useAnalysisStore((s) => s.setUseSampleBilling);
   const runAnalysis = useAnalysisStore((s) => s.runAnalysis);
   const results = useAnalysisStore((s) => s.results);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      useSessionStore.getState().ensureSession();
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    const pid = results?.migration_plan?.plan_id;
+    if (pid) useSessionStore.getState().setPlanId(pid);
+  }, [results?.migration_plan?.plan_id]);
 
   const [phase, setPhase] = useState("chat"); // chat, running, results
   const [pipelineAgents, setPipelineAgents] = useState([]);

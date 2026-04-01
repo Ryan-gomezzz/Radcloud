@@ -17,6 +17,11 @@ export default defineConfig({
       '/sample-data': { target: 'http://localhost:8000', changeOrigin: true },
       '/health': { target: 'http://localhost:8000', changeOrigin: true },
       '/chat': { target: 'http://localhost:8000', changeOrigin: true },
+      '/auth': { target: 'http://localhost:8000', changeOrigin: true },
+      '/cloud': { target: 'http://localhost:8000', changeOrigin: true },
+      '/sessions': { target: 'http://localhost:8000', changeOrigin: true },
+      '/execution': { target: 'http://localhost:8000', changeOrigin: true },
+      '/pipeline': { target: 'http://localhost:8000', changeOrigin: true },
     },
   },
 })

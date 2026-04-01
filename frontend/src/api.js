@@ -4,6 +4,69 @@ import cachedResponse from "./data/cachedResponse.json";
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 const VITE_DEMO = import.meta.env.VITE_DEMO_MODE === "true";
 
+const DEMO_MIGRATION_PLAN = {
+  plan_id: "plan-demo-001",
+  phases: [
+    {
+      id: "p1",
+      name: "Infrastructure Setup",
+      duration_days: 5,
+      resources: ["VPC", "Subnets", "Security groups"],
+    },
+    {
+      id: "p2",
+      name: "Compute Migration",
+      duration_days: 8,
+      resources: ["GCE", "MIG", "Load balancers"],
+    },
+    {
+      id: "p3",
+      name: "Database Migration",
+      duration_days: 12,
+      resources: ["Cloud SQL", "Memorystore"],
+    },
+    {
+      id: "p4",
+      name: "Storage + CDN",
+      duration_days: 4,
+      resources: ["GCS", "Cloud CDN"],
+    },
+    {
+      id: "p5",
+      name: "Verification & Cutover",
+      duration_days: 3,
+      resources: ["DNS", "Monitoring"],
+    },
+  ],
+  estimated_cost_delta: 312,
+  risk_count_high: 2,
+  architecture_mappings: [],
+  cost_categories: [
+    { category: "Compute", before: 4200, after: 4512 },
+    { category: "Database", before: 1800, after: 1950 },
+    { category: "Storage", before: 890, after: 920 },
+    { category: "Networking", before: 640, after: 710 },
+    { category: "Other", before: 310, after: 330 },
+  ],
+  risks: [],
+};
+
+/** JWT from signup/login for authenticated API calls. */
+export function authHeaders() {
+  try {
+    const t = localStorage.getItem("radcloud_token");
+    if (t) return { Authorization: `Bearer ${t}` };
+  } catch {
+    /* ignore */
+  }
+  return {};
+}
+
+function mergeMigrationPlan(data) {
+  if (data?.migration_plan) return data;
+  return { ...data, migration_plan: DEMO_MIGRATION_PLAN };
+}
+
 /**
  * GET /sample-data — Terraform + billing CSV text for demo flow.
  */
@@ -23,7 +86,9 @@ export async function getSampleData() {
   }
 
   try {
-    const response = await fetch(`${API_BASE}/sample-data`);
+    const response = await fetch(`${API_BASE}/sample-data`, {
+      headers: { ...authHeaders() },
+    });
     if (!response.ok) {
       throw new Error(`sample-data failed: ${response.status}`);
     }
@@ -49,26 +114,28 @@ export async function getSampleData() {
 export async function analyzeInfrastructure(formData) {
   if (VITE_DEMO) {
     const tf = formData.get("terraform_config");
-    return {
+    return mergeMigrationPlan({
       ...cachedResponse,
       demo_mode: true,
       client_demo: true,
       gcp_config_raw: typeof tf === "string" ? tf : "",
-    };
+    });
   }
 
   try {
     const response = await fetch(`${API_BASE}/analyze`, {
       method: "POST",
+      headers: { ...authHeaders() },
       body: formData,
     });
     if (!response.ok) {
       throw new Error(`Request failed: ${response.status}`);
     }
-    return await response.json();
+    const json = await response.json();
+    return mergeMigrationPlan(json);
   } catch {
     const tf = formData.get("terraform_config");
-    return {
+    return mergeMigrationPlan({
       ...cachedResponse,
       demo_mode: true,
       client_fallback: true,
@@ -80,7 +147,7 @@ export async function analyzeInfrastructure(formData) {
           error: "API unreachable — showing cached demo response.",
         },
       ],
-    };
+    });
   }
 }
 

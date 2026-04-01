@@ -46,13 +46,26 @@ export function ChatResultsCard({ results }) {
           </p>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={() => navigate("/app/dashboard")}
-        className="btn-primary w-full py-3 text-[14px]"
-      >
-        View full dashboard
-      </button>
+      <div className="flex flex-col gap-2">
+        {results?.migration_plan?.plan_id && (
+          <button
+            type="button"
+            onClick={() =>
+              navigate(`/app/plan-review/${results.migration_plan.plan_id}`)
+            }
+            className="w-full rounded-lg border border-[var(--accent-primary)]/50 bg-[color-mix(in_srgb,var(--accent-primary)_12%,transparent)] py-3 text-[14px] font-medium text-[var(--accent-primary)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent-primary)_18%,transparent)]"
+          >
+            View migration plan
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => navigate("/app/dashboard")}
+          className="btn-primary w-full py-3 text-[14px]"
+        >
+          View full dashboard
+        </button>
+      </div>
     </div>
   );
 }

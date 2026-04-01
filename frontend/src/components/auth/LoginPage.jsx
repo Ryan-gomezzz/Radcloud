@@ -12,13 +12,19 @@ const inputClass =
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const login = useAuthStore((s) => s.login);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(email || "demo@example.com");
-    navigate("/app/onboarding", { replace: true });
+    setError("");
+    try {
+      await login(email || "demo@example.com", password || "changeme");
+      navigate("/app/onboarding", { replace: true });
+    } catch (err) {
+      setError(err?.message || "Sign in failed");
+    }
   };
 
   return (
@@ -50,6 +56,11 @@ export function LoginPage() {
               Sign in to launch the guided analysis console.
             </p>
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <p className="rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                  {error}
+                </p>
+              )}
               <div>
                 <label
                   htmlFor="email"
