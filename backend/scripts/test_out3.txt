@@ -1,0 +1,41 @@
+﻿Rows loaded: 288
+DataFrame shape: (288, 8)
+Columns: ['service', 'sku', 'usage_start', 'usage_end', 'usage_amount', 'usage_unit', 'cost', 'month']
+Months: ['2024-01', '2024-02', '2024-03', '2024-04', '2024-05', '2024-06', '2024-07', '2024-08', '2024-09', '2024-10', '2024-11', '2024-12']
+
+Patterns (9):
+  BigQuery             -> steady_state    (CV=0.142, rec=reserved_instance)
+  Cloud Functions      -> bursty          (CV=0.356, rec=on_demand)
+  Cloud Pub/Sub        -> predictable     (CV=0.171, rec=savings_plan)
+  Cloud Run            -> bursty          (CV=0.472, rec=on_demand)
+  Cloud SQL            -> steady_state    (CV=0.025, rec=reserved_instance)
+  Cloud Storage        -> steady_state    (CV=0.035, rec=reserved_instance)
+  Compute Engine       -> steady_state    (CV=0.009, rec=reserved_instance)
+  Memorystore          -> steady_state    (CV=0.031, rec=reserved_instance)
+  Networking           -> steady_state    (CV=0.120, rec=reserved_instance)
+
+Cost results:
+  GCP monthly:     $9,258.80
+  AWS on-demand:   $8,801.45
+  AWS optimised:   $6,095.49
+  Monthly savings: $2,705.96
+  First-year:      $32,471.57
+  Obs window:      $8,117.89
+
+MATH CHECK: sum(RI annual) = $32,471.57, hero = $32,471.57, match = True
+
+RI Recommendations (3):
+  4x db.m5.2xlarge RDS (1-year, All Upfront) -> saves $9,586.94/yr
+  9x m5.4xlarge EC2 (1-year, All Upfront) -> saves $22,406.33/yr
+  1x cache.m5.large ElastiCache (1-year, All Upfront) -> saves $478.30/yr
+
+Monthly comparison (12 months):
+  2024-01: GCP $9,171.97 | AWS OD $8,718.91 | AWS Opt $6,038.33
+  2024-02: GCP $9,217.64 | AWS OD $8,762.32 | AWS Opt $6,068.39
+  2024-03: GCP $9,282.21 | AWS OD $8,823.70 | AWS Opt $6,110.90
+  ...
+
+Sanity: savings = 29.2% of annual GCP spend (should be < 40%)
+Sanity: hero number in $30K-$50K range? True
+
+=== ALL CHECKS PASSED ===
