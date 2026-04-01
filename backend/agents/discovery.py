@@ -4,8 +4,8 @@ Reads ``context["gcp_config_raw"]`` (Terraform HCL, YAML, or gcloud output),
 uses Claude via AWS Bedrock to parse it into a normalised JSON inventory,
 and writes the result to ``context["gcp_inventory"]``.
 
-If the LLM call fails, writes an empty inventory with an error record.
-A hardcoded NovaPay demo fallback is added separately in step 2.3.
+If the LLM call fails or the response cannot be parsed, falls back to a
+hardcoded NovaPay demo inventory so the pipeline never breaks during a demo.
 
 Validation pipeline (per resource):
   1. ``_clean_resource_type``  — fuzzy-match type strings to canonical keys
@@ -18,6 +18,7 @@ resources, and logs/discards broken ones.
 
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import re
@@ -131,10 +132,10 @@ async def run(context: dict) -> dict:
         )
     except Exception as exc:
         logger.exception("Discovery agent: Bedrock call failed")
-        context["gcp_inventory"] = []
+        context["gcp_inventory"] = _use_fallback()
         context.setdefault("errors", []).append({
             "agent": "discovery",
-            "error": f"LLM call failed: {exc}",
+            "error": f"LLM call failed (using demo fallback): {exc}",
         })
         return context
 
@@ -146,10 +147,10 @@ async def run(context: dict) -> dict:
             "Discovery agent: could not parse LLM response (len=%d)",
             len(raw_text) if raw_text else 0,
         )
-        context["gcp_inventory"] = []
+        context["gcp_inventory"] = _use_fallback()
         context.setdefault("errors", []).append({
             "agent": "discovery",
-            "error": "Failed to parse LLM response as JSON",
+            "error": "Failed to parse LLM response (using demo fallback)",
         })
         return context
 
@@ -437,3 +438,294 @@ def _validate_inventory(raw_items: list) -> list[dict[str, Any]]:
         )
 
     return valid
+
+
+# ---------------------------------------------------------------------------
+# NovaPay demo fallback — used when LLM is unavailable
+# ---------------------------------------------------------------------------
+
+def _use_fallback() -> list[dict[str, Any]]:
+    """Return a deep copy of the NovaPay demo inventory.
+
+    Uses ``copy.deepcopy`` so callers can mutate the result without
+    affecting future calls.
+    """
+    logger.warning("Discovery agent: using hardcoded NovaPay fallback")
+    return copy.deepcopy(_NOVAPAY_FALLBACK)
+
+
+_NOVAPAY_FALLBACK: list[dict[str, Any]] = [
+    {
+        "resource_id": "web-server-1",
+        "resource_type": "compute_instance",
+        "service": "Compute Engine",
+        "name": "web-server-1",
+        "config": {
+            "machine_type": "n1-standard-4",
+            "region": "us-central1",
+            "zone": "us-central1-a",
+            "disk_size_gb": 100,
+            "disk_type": "pd-ssd",
+            "role": "web",
+        },
+    },
+    {
+        "resource_id": "web-server-2",
+        "resource_type": "compute_instance",
+        "service": "Compute Engine",
+        "name": "web-server-2",
+        "config": {
+            "machine_type": "n1-standard-4",
+            "region": "us-central1",
+            "zone": "us-central1-b",
+            "disk_size_gb": 100,
+            "disk_type": "pd-ssd",
+            "role": "web",
+        },
+    },
+    {
+        "resource_id": "payment-worker-1",
+        "resource_type": "compute_instance",
+        "service": "Compute Engine",
+        "name": "payment-worker-1",
+        "config": {
+            "machine_type": "n1-highcpu-8",
+            "region": "us-central1",
+            "zone": "us-central1-a",
+            "disk_size_gb": 200,
+            "disk_type": "pd-ssd",
+            "role": "batch",
+        },
+    },
+    {
+        "resource_id": "novapay-primary-db",
+        "resource_type": "cloud_sql",
+        "service": "Cloud SQL",
+        "name": "novapay-primary-db",
+        "config": {
+            "database_version": "POSTGRES_14",
+            "tier": "db-n1-standard-4",
+            "region": "us-central1",
+            "disk_size_gb": 500,
+            "availability_type": "REGIONAL",
+        },
+    },
+    {
+        "resource_id": "novapay-replica-db",
+        "resource_type": "cloud_sql",
+        "service": "Cloud SQL",
+        "name": "novapay-replica-db",
+        "config": {
+            "database_version": "POSTGRES_14",
+            "tier": "db-n1-standard-2",
+            "region": "us-central1",
+            "disk_size_gb": 500,
+            "availability_type": "ZONAL",
+            "replica_of": "novapay-primary-db",
+        },
+    },
+    {
+        "resource_id": "novapay-redis",
+        "resource_type": "memorystore_redis",
+        "service": "Memorystore",
+        "name": "novapay-redis",
+        "config": {
+            "tier": "STANDARD_HA",
+            "memory_size_gb": 5,
+            "region": "us-central1",
+            "redis_version": "REDIS_6_X",
+        },
+    },
+    {
+        "resource_id": "novapay-assets",
+        "resource_type": "gcs_bucket",
+        "service": "Cloud Storage",
+        "name": "novapay-assets-prod",
+        "config": {
+            "location": "US",
+            "storage_class": "STANDARD",
+            "versioning": True,
+        },
+    },
+    {
+        "resource_id": "novapay-logs",
+        "resource_type": "gcs_bucket",
+        "service": "Cloud Storage",
+        "name": "novapay-logs-archive",
+        "config": {
+            "location": "US",
+            "storage_class": "NEARLINE",
+            "lifecycle_days": 90,
+        },
+    },
+    {
+        "resource_id": "novapay-backups",
+        "resource_type": "gcs_bucket",
+        "service": "Cloud Storage",
+        "name": "novapay-db-backups",
+        "config": {
+            "location": "US",
+            "storage_class": "COLDLINE",
+            "versioning": True,
+        },
+    },
+    {
+        "resource_id": "novapay-api",
+        "resource_type": "cloud_run",
+        "service": "Cloud Run",
+        "name": "novapay-api",
+        "config": {
+            "region": "us-central1",
+            "cpu": "2",
+            "memory": "2Gi",
+            "min_instances": 1,
+            "max_instances": 20,
+        },
+    },
+    {
+        "resource_id": "webhook-ingest-fn",
+        "resource_type": "cloud_function",
+        "service": "Cloud Functions",
+        "name": "webhook-ingest-fn",
+        "config": {
+            "region": "us-central1",
+            "runtime": "python311",
+            "trigger": "http",
+            "memory_mb": 512,
+        },
+    },
+    {
+        "resource_id": "settlement-cron-fn",
+        "resource_type": "cloud_function",
+        "service": "Cloud Functions",
+        "name": "settlement-cron-fn",
+        "config": {
+            "region": "us-central1",
+            "runtime": "python311",
+            "trigger": "pubsub",
+            "memory_mb": 1024,
+        },
+    },
+    {
+        "resource_id": "payment-events",
+        "resource_type": "pubsub_topic",
+        "service": "Pub/Sub",
+        "name": "payment-events",
+        "config": {"message_retention_duration": "604800s"},
+    },
+    {
+        "resource_id": "payment-events-sub",
+        "resource_type": "pubsub_subscription",
+        "service": "Pub/Sub",
+        "name": "payment-events-sub",
+        "config": {
+            "topic": "payment-events",
+            "ack_deadline_seconds": 60,
+            "push_endpoint": None,
+        },
+    },
+    {
+        "resource_id": "novapay_analytics",
+        "resource_type": "bigquery_dataset",
+        "service": "BigQuery",
+        "name": "novapay_analytics",
+        "config": {"location": "US", "default_table_expiration_ms": None},
+    },
+    {
+        "resource_id": "transactions_curated",
+        "resource_type": "bigquery_table",
+        "service": "BigQuery",
+        "name": "transactions_curated",
+        "config": {
+            "dataset_id": "novapay_analytics",
+            "partitioning": "DAY",
+        },
+    },
+    {
+        "resource_id": "novapay-vpc",
+        "resource_type": "vpc_network",
+        "service": "VPC",
+        "name": "novapay-vpc",
+        "config": {"auto_create_subnetworks": False, "routing_mode": "REGIONAL"},
+    },
+    {
+        "resource_id": "private-app-subnet",
+        "resource_type": "vpc_subnet",
+        "service": "VPC",
+        "name": "private-app-subnet",
+        "config": {
+            "ip_cidr_range": "10.0.1.0/24",
+            "region": "us-central1",
+            "private_ip_google_access": True,
+        },
+    },
+    {
+        "resource_id": "private-db-subnet",
+        "resource_type": "vpc_subnet",
+        "service": "VPC",
+        "name": "private-db-subnet",
+        "config": {
+            "ip_cidr_range": "10.0.2.0/24",
+            "region": "us-central1",
+            "private_ip_google_access": True,
+        },
+    },
+    {
+        "resource_id": "fw-allow-internal",
+        "resource_type": "firewall_rule",
+        "service": "VPC Firewall",
+        "name": "fw-allow-internal",
+        "config": {
+            "direction": "INGRESS",
+            "ports": ["tcp:0-65535"],
+            "source_ranges": ["10.0.0.0/16"],
+        },
+    },
+    {
+        "resource_id": "fw-allow-https",
+        "resource_type": "firewall_rule",
+        "service": "VPC Firewall",
+        "name": "fw-allow-https",
+        "config": {
+            "direction": "INGRESS",
+            "ports": ["tcp:443"],
+            "source_ranges": ["0.0.0.0/0"],
+            "target_tags": ["web"],
+        },
+    },
+    {
+        "resource_id": "fw-deny-all-egress-default",
+        "resource_type": "firewall_rule",
+        "service": "VPC Firewall",
+        "name": "fw-restrict-egress-db",
+        "config": {
+            "direction": "EGRESS",
+            "deny": True,
+            "target_tags": ["db"],
+        },
+    },
+    {
+        "resource_id": "sa-api-runtime",
+        "resource_type": "service_account",
+        "service": "IAM",
+        "name": "sa-api-runtime",
+        "config": {"account_id": "novapay-api-runtime", "display_name": "NovaPay API Runtime"},
+    },
+    {
+        "resource_id": "sa-batch-worker",
+        "resource_type": "service_account",
+        "service": "IAM",
+        "name": "sa-batch-worker",
+        "config": {"account_id": "novapay-batch", "display_name": "NovaPay Batch Worker"},
+    },
+    {
+        "resource_id": "iam-cloudsql-client",
+        "resource_type": "iam_binding",
+        "service": "IAM",
+        "name": "project_iam_cloudsql_client",
+        "config": {
+            "role": "roles/cloudsql.client",
+            "members": ["serviceAccount:novapay-api-runtime@*.iam.gserviceaccount.com"],
+        },
+    },
+]
