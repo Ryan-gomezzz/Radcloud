@@ -3,8 +3,10 @@
 **Project:** RADCloud  
 **Role:** Discovery Agent + Mapping Agent  
 **Time Budget:** 24 hours  
-**Stack:** Python, Claude API (claude-sonnet-4-20250514), JSON mapping tables  
+**Stack:** Python, **Anthropic Claude via AWS Bedrock** (not the direct Anthropic API), JSON mapping tables  
 **Dependencies:** None inbound. Dev 1 (Orchestrator), Dev 3 (FinOps), and Dev 4 (Risk + Watchdog / Runbook / IaC) all depend on your output.
+
+> **LLM inference (platform standard):** Agents invoke **Claude on Amazon Bedrock** using `bedrock-runtime` `invoke_model`. Shared code: `backend/llm.py` (`call_llm` / `call_llm_async`), model ID and region: `backend/config.py` (`BEDROCK_MODEL_ID`, `AWS_DEFAULT_REGION`). Agent contract: `async def run(context: dict) -> dict` — no client passed in. Code snippets in this doc that show `claude_client.messages.create` illustrate the **logical** Messages API shape; implement them through the Bedrock wrapper (same prompts, Bedrock request/response format per `llm.py`).
 
 ---
 
@@ -134,7 +136,7 @@ This is shared time with the full team. Your priority in this hour:
 
 ### Hours 1–4: Build the Discovery Agent
 
-**This is a Claude-powered parser.** You're not writing a full Terraform parser — you're using Claude to extract structured data from messy infrastructure config.
+**This is a Claude-on-Bedrock-powered parser.** You're not writing a full Terraform parser — you're using Claude (via Amazon Bedrock) to extract structured data from messy infrastructure config.
 
 **Step 1 — The GCP service registry (hardcoded reference)**
 
@@ -737,7 +739,7 @@ Now make it handle real-world messiness:
 - If the Terraform is very long (>50 resources), Claude's response might get truncated. Handle this by chunking: split the input into groups of 15–20 resources, run Discovery on each chunk, merge results.
 
 **Retry logic:**
-- Add a simple retry wrapper for Claude API calls: retry up to 2 times with 2-second delay on failure.
+- Add a simple retry wrapper for Bedrock inference calls (or use retries in `backend/llm.py`): retry up to 2 times with 2-second delay on failure.
 
 ```python
 import asyncio

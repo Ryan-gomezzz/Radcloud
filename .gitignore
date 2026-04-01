@@ -12,6 +12,9 @@ build/
 node_modules/
 frontend/dist/
 
+# SPA build copied for FastAPI static hosting (Railway / local)
+backend/static/
+
 # IDE / OS
 .idea/
 .vscode/

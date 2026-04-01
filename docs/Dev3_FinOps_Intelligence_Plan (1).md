@@ -3,9 +3,11 @@
 **Project:** RADCloud  
 **Role:** FinOps Intelligence Agent (the X-factor)  
 **Time Budget:** 24 hours  
-**Stack:** Python, Claude API (claude-sonnet-4-20250514), pandas for billing analysis  
+**Stack:** Python, **Anthropic Claude via AWS Bedrock** (not the direct Anthropic API), pandas for billing analysis  
 **Dependencies inbound:** `aws_mapping` from Dev 2 (available after hour 8). You can work independently until then using your own test data.  
 **Dependencies outbound:** Dev 4 (Watchdog / Runbook / IaC) consumes your `finops` output. Dev 1 (Frontend) renders your data in the most important tab of the entire demo.
+
+> **LLM inference (platform standard):** All Claude usage goes through **Amazon Bedrock** (`backend/llm.py`, `backend/config.py`). Use `call_llm_async()` from the shared module; do not add the `anthropic` SDK. Snippets below that reference `claude_client.messages.create` are illustrative — map them to Bedrock’s `invoke_model` payload (see `llm.py`).
 
 ---
 
@@ -740,7 +742,7 @@ async def run(context: dict, claude_client) -> dict:
     # Step 4: Build monthly comparison
     comparison = build_monthly_comparison(df, cost_results)
 
-    # Step 5: Generate natural language summary via Claude
+    # Step 5: Generate natural language summary via Claude on Bedrock
     summary_input = {
         "patterns": patterns,
         "cost_results": cost_results,
@@ -909,8 +911,8 @@ Fix: Tune the sample billing data. Increase the compute hours, add a second data
 **The savings number is unrealistically large.**
 Fix: Sanity check — total_first_year_savings should not exceed 40% of total GCP annual spend. If it does, your pricing tables might have errors or your instance count estimation is off.
 
-**Claude generates a bad summary.**
-Fix: You have a hardcoded fallback summary that uses f-strings with the actual numbers. It's less elegant but always accurate. The fallback fires automatically on any Claude API error.
+**Claude (Bedrock) generates a bad summary.**
+Fix: You have a hardcoded fallback summary that uses f-strings with the actual numbers. It's less elegant but always accurate. The fallback fires automatically on any Bedrock / LLM error.
 
 ---
 
