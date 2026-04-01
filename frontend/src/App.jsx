@@ -5,7 +5,7 @@ import { ResultsPanel } from "./components/ResultsPanel";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
-const PIPELINE_KEYS = ["discovery", "mapping", "risk", "finops", "runbook"];
+const PIPELINE_KEYS = ["discovery", "mapping", "risk", "finops", "runbook", "watchdog"];
 
 async function loadSampleTerraform() {
   const r = await fetch("/demo/sample.tf");

@@ -4,13 +4,17 @@ import { ArchitectureTab } from "./tabs/ArchitectureTab";
 import { RisksTab } from "./tabs/RisksTab";
 import { FinOpsTab } from "./tabs/FinOpsTab";
 import { RunbookTab } from "./tabs/RunbookTab";
+import { WatchdogTab } from "./tabs/WatchdogTab";
+import { IaCTab } from "./tabs/IaCTab";
 
 const TABS = [
-  { id: "assets", label: "Asset map" },
-  { id: "arch", label: "Architecture" },
-  { id: "risks", label: "Risks" },
-  { id: "finops", label: "FinOps plan" },
-  { id: "runbook", label: "Runbook" },
+  { id: "assets", label: "Asset map", icon: "📦" },
+  { id: "arch", label: "Architecture", icon: "🏗️" },
+  { id: "risks", label: "Risks", icon: "⚠️" },
+  { id: "finops", label: "FinOps plan", icon: "💰" },
+  { id: "runbook", label: "Runbook", icon: "📋" },
+  { id: "watchdog", label: "Watchdog", icon: "🐕" },
+  { id: "iac", label: "IaC Output", icon: "🔧" },
 ];
 
 export function ResultsPanel({ result }) {
@@ -32,12 +36,13 @@ export function ResultsPanel({ result }) {
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`rounded-lg px-3 py-2 text-sm font-medium ${
+            className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               tab === t.id
                 ? "bg-white text-blue-900 shadow-sm ring-1 ring-slate-200"
                 : "text-slate-600 hover:bg-white/80"
             }`}
           >
+            <span className="mr-1.5">{t.icon}</span>
             {t.label}
           </button>
         ))}
@@ -50,9 +55,13 @@ export function ResultsPanel({ result }) {
             awsArchitecture={result.aws_architecture}
           />
         )}
-        {tab === "risks" && <RisksTab risks={result.risks} />}
+        {tab === "risks" && (
+          <RisksTab risks={result.risks} riskSummary={result.risk_summary} />
+        )}
         {tab === "finops" && <FinOpsTab finops={result.finops} />}
         {tab === "runbook" && <RunbookTab runbook={result.runbook} />}
+        {tab === "watchdog" && <WatchdogTab watchdog={result.watchdog} />}
+        {tab === "iac" && <IaCTab iacBundle={result.iac_bundle} />}
       </div>
     </div>
   );

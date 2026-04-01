@@ -12,7 +12,7 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
-from agents import discovery, finops, mapping, risk, runbook
+from agents import discovery, finops, mapping, risk, runbook, watchdog
 
 try:
     import anthropic
@@ -36,6 +36,7 @@ PIPELINE: list[tuple[str, Any]] = [
     ("risk", risk.run),
     ("finops", finops.run),
     ("runbook", runbook.run),
+    ("watchdog", watchdog.run),
 ]
 
 

@@ -1,4 +1,4 @@
-const AGENTS = ["Discovery", "Mapping", "Risk", "FinOps", "Runbook"];
+const AGENTS = ["Discovery", "Mapping", "Risk", "FinOps", "Runbook", "Watchdog"];
 
 export function StatusBar({ currentAgent, completedAgents }) {
   return (

@@ -23,5 +23,8 @@ class RADCloudContext(BaseModel):
     aws_mapping: list[dict[str, Any]] | None = None
     aws_architecture: str | None = None
     risks: list[dict[str, Any]] | None = None
+    risk_summary: dict[str, Any] | None = None
     finops: dict[str, Any] | None = None
-    runbook: list[dict[str, Any]] | str | None = None
+    runbook: list[dict[str, Any]] | dict[str, Any] | str | None = None
+    watchdog: dict[str, Any] | None = None
+    iac_bundle: dict[str, Any] | None = None
