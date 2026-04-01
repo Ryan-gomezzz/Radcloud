@@ -3,7 +3,9 @@
 **Project:** RADCloud  
 **Role:** Orchestrator + Frontend  
 **Time Budget:** 24 hours  
-**Stack:** React (Vite + Tailwind), Python (FastAPI), AWS Bedrock — Anthropic Claude (see `backend/llm.py`, `backend/config.py`)
+**Stack:** React (Vite + Tailwind), Python (FastAPI), **AWS Bedrock — Anthropic Claude** (see `backend/llm.py`, `backend/config.py`)
+
+> **LLM inference:** The product uses **Claude only through Amazon Bedrock** (`invoke_model`), not the standalone Anthropic API. Orchestrator calls agents as `await agent_fn(context)`; agents use `call_llm_async()` from `backend/llm.py`.
 
 ---
 
@@ -382,7 +384,7 @@ This is when the real agents from Dev 2/3/4 replace your stubs.
 - Test the full pipeline: real Terraform input → real Discovery → real Mapping → real Risk → real FinOps → real Watchdog → frontend displays real output.
 - Debug integration issues. Common problems:
   - Agent writes to a context key with a different name or structure than the frontend expects → fix the agent or the frontend.
-  - Agent takes too long (Claude API call timing out) → add timeout handling, increase timeout.
+  - Agent takes too long (Bedrock / Claude inference timing out) → add timeout handling, increase timeout.
   - Agent throws an error on real data → work with the agent's dev to fix.
 - Make sure partial results display correctly: if the Risk agent fails, the frontend should still show Asset Map, Architecture, and whatever else succeeded.
 
@@ -408,7 +410,7 @@ This is when the real agents from Dev 2/3/4 replace your stubs.
 - Lock the code. No new features.
 - Build the demo script (exact click sequence, exact talking points per tab).
 - Run the demo end-to-end at least 5 times.
-- Pre-cache the Claude API responses for the sample data: save the full context JSON from a successful run and add a `--demo-mode` flag that returns the cached result instead of calling Claude. This guarantees the demo works even if the API is slow or rate-limited.
+- Pre-cache the LLM pipeline responses for the sample data: save the full context JSON from a successful run and add a `--demo-mode` flag that returns the cached result instead of calling Bedrock. This guarantees the demo works even if inference is slow or rate-limited.
 - Time the demo. It should be under 5 minutes.
 - Prepare for questions: "How does the mapping work?", "Where does the pricing data come from?", "How accurate is the cost estimate?", "What exactly does Watchdog do after migration?", "Is this real Terraform or a plan artifact?"
 
@@ -434,8 +436,8 @@ You cannot afford to be blocked by Dev 2/3/4. With stubs, your frontend and orch
 **Why a "Try Sample Data" button?**
 Live demos fail. Network issues, API rate limits, typos. The sample data button is your insurance policy. If anything goes wrong during the live demo, click it and the demo still works perfectly from cached data.
 
-**Why cache Claude API responses for demo mode?**
-Claude API latency can vary from 2–15 seconds per call. With 5 agents each making 1–2 calls, the demo could take 30–60 seconds of loading. Cached responses make it instant. Only use caching during the demo, not during development/testing.
+**Why cache Bedrock responses for demo mode?**
+Claude-on-Bedrock latency can vary from 2–15 seconds per call. With 5 agents each making 1–2 calls, the demo could take 30–60 seconds of loading. Cached responses make it instant. Only use caching during the demo, not during development/testing.
 
 ---
 

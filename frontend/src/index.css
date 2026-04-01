@@ -1,21 +1,118 @@
 @import "tailwindcss";
 
-:root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #12121a;
-  --bg-tertiary: #1a1a2e;
-  --bg-card: #16161f;
-  --border-card: #2a2a3e;
-  --border-card-hover: #3a3a5e;
-  --accent-teal: #00d4aa;
-  --accent-blue: #4a9eff;
-  --text-muted: #6b7280;
-  --text-body: #d1d5db;
-  --text-heading: #f9fafb;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --finops-purple: #a855f7;
-  --watchdog-pink: #ec4899;
+/* Default = dark (architecture deep-dive palette: slate base, cyan / sky / violet) */
+:root,
+[data-theme="dark"] {
+  --bg-primary: #030712;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --bg-card: #111827;
+  --bg-card-hover: #1f2937;
+  --bg-input: #0f172a;
+
+  --border-default: #1e293b;
+  --border-hover: #334155;
+  --border-focus: #22d3ee;
+  --border-card: #1e293b;
+  --border-card-hover: #334155;
+
+  --accent-primary: #22d3ee;
+  --accent-secondary: #38bdf8;
+  --accent-violet: #a78bfa;
+  --accent-teal: #2dd4bf;
+  --accent-blue: #38bdf8;
+  --accent-gradient: linear-gradient(135deg, #22d3ee, #38bdf8, #a78bfa);
+
+  --glow-cyan: rgba(34, 211, 238, 0.15);
+  --glow-violet: rgba(167, 139, 250, 0.12);
+
+  --color-success: #2dd4bf;
+  --color-warning: #fbbf24;
+  --color-danger: #f87171;
+  --color-info: #38bdf8;
+
+  --text-heading: #f8fafc;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+
+  --agent-discovery: #38bdf8;
+  --agent-mapping: #2dd4bf;
+  --agent-risk: #fbbf24;
+  --agent-finops: #a78bfa;
+  --agent-watchdog: #f472b6;
+
+  --finops-purple: #a78bfa;
+  --watchdog-pink: #f472b6;
+  --warning: #fbbf24;
+  --danger: #f87171;
+
+  --logo-fg: #030712;
+  --chart-grid: #1e293b;
+  --chart-axis: #94a3b8;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f5f9;
+  --bg-input: #ffffff;
+
+  --border-default: #e2e8f0;
+  --border-hover: #cbd5e1;
+  --border-focus: #0891b2;
+  --border-card: #e2e8f0;
+  --border-card-hover: #cbd5e1;
+
+  --accent-primary: #0891b2;
+  --accent-secondary: #0284c7;
+  --accent-violet: #7c3aed;
+  --accent-teal: #0d9488;
+  --accent-blue: #0284c7;
+  --accent-gradient: linear-gradient(135deg, #0891b2, #0284c7, #7c3aed);
+
+  --glow-cyan: rgba(8, 145, 178, 0.12);
+  --glow-violet: rgba(124, 58, 237, 0.08);
+
+  --color-success: #0d9488;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #0284c7;
+
+  --text-heading: #0f172a;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+
+  --agent-discovery: #0284c7;
+  --agent-mapping: #0d9488;
+  --agent-risk: #d97706;
+  --agent-finops: #7c3aed;
+  --agent-watchdog: #db2777;
+
+  --finops-purple: #7c3aed;
+  --watchdog-pink: #db2777;
+  --warning: #d97706;
+  --danger: #dc2626;
+
+  --logo-fg: #ffffff;
+  --chart-grid: #e2e8f0;
+  --chart-axis: #64748b;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
@@ -28,12 +125,55 @@ body {
   color: var(--text-body);
 }
 
+.font-display {
+  font-family: "Plus Jakarta Sans", Inter, system-ui, sans-serif;
+}
+
 #root {
   min-height: 100vh;
 }
 
 .font-mono-code {
   font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Atmospheric app background */
+.rad-shell {
+  position: relative;
+  background: var(--bg-primary);
+}
+
+.rad-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 80% at 10% -20%, var(--glow-cyan), transparent 50%),
+    radial-gradient(ellipse 100% 60% at 90% 100%, var(--glow-violet), transparent 45%);
+  opacity: 0.9;
+}
+
+.rad-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.25;
+  background-image: linear-gradient(
+      var(--border-default) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, var(--border-default) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, black, transparent);
+}
+
+.rad-shell > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Card base */
@@ -51,19 +191,24 @@ body {
 
 /* Primary button */
 .btn-primary {
-  background: linear-gradient(135deg, #00d4aa, #00b894);
-  color: #0a0a0f;
+  background: var(--accent-gradient);
+  color: var(--logo-fg);
   font-weight: 600;
   padding: 12px 24px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: filter 0.2s ease, box-shadow 0.2s ease;
+  transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 
 .btn-primary:hover:not(:disabled) {
-  filter: brightness(1.1);
-  box-shadow: 0 0 20px rgba(0, 212, 170, 0.25);
+  filter: brightness(1.08);
+  box-shadow: 0 8px 32px rgba(34, 211, 238, 0.2);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .btn-primary:hover:not(:disabled) {
+  box-shadow: 0 8px 28px rgba(8, 145, 178, 0.2);
 }
 
 .btn-primary:disabled {
@@ -80,23 +225,24 @@ body {
   padding: 10px 20px;
   border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .btn-outline:hover {
-  border-color: var(--accent-teal);
-  color: var(--accent-teal);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--bg-tertiary);
 }
 
 /* Tab content fade */
 .tab-panel-enter {
-  animation: tabFade 0.25s ease-out;
+  animation: tabFade 0.35s ease-out;
 }
 
 @keyframes tabFade {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -117,4 +263,34 @@ body {
 
 .animate-hero-number {
   animation: heroNumber 0.8s ease-out forwards;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2.5s ease-in-out infinite;
+}
+
+/* Onboarding chat canvas */
+.rad-chat-canvas {
+  border-radius: 16px;
+  border: 1px solid var(--border-default);
+  background: linear-gradient(
+    180deg,
+    var(--bg-card) 0%,
+    color-mix(in srgb, var(--bg-secondary) 92%, transparent) 100%
+  );
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .rad-chat-canvas {
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
 }

@@ -90,18 +90,30 @@ Copy/sync `frontend/src/data/cachedResponse.json` from `data/cached_response.jso
 
 ## Frontend
 
+React (Vite), Tailwind CSS 4, React Router, Zustand, Lucide icons, Recharts, and scripted onboarding chat. Routes: `/login`, `/signup`, `/app/onboarding`, `/app/dashboard` (and FinOps, Migration, Watchdog, Runbook, IaC sub-routes). Mock auth uses `localStorage` (`radcloud_user`).
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
+Vite dev server proxies `/analyze`, `/sample-data`, and `/health` to `http://localhost:8000`.
+
 Optional `frontend/.env`:
 
-- `VITE_API_URL=http://localhost:8000` (default)
+- `VITE_API_URL` — leave unset or empty for same-origin API (production: FastAPI serves the SPA). Set to `http://localhost:8000` if you run the UI without the proxy.
 - `VITE_DEMO_MODE=true` — skip API and use bundled `src/data/cachedResponse.json`
 
 If the API is unreachable, the app falls back to the cached demo response automatically.
+
+## Single-port production (FastAPI + static SPA)
+
+After `npm run build` in `frontend/`, copy the contents of `frontend/dist/` into `backend/static/` (including the `assets/` folder). With `backend/static/` present, `uvicorn` serves the SPA and `/assets/*`; API routes remain `/analyze`, `/analyze-stream`, `/sample-data`, `/health`, `/docs`, etc.
+
+## Railway
+
+Root [`nixpacks.toml`](nixpacks.toml) installs Python and Node, builds the frontend, and copies `frontend/dist/*` to `backend/static/`. [`railway.json`](railway.json) sets the start command and `/health` check. Set `DEMO_MODE=true` in Railway for instant cached analyses when appropriate.
 
 ## Sample data
 

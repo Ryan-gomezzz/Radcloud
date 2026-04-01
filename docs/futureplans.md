@@ -7,6 +7,8 @@
 
 This document outlines the production roadmap for RADCloud beyond the 24-hour hackathon prototype. It covers the fully automated migration pipeline, the RAG implementation for improved AI decision-making, and the security architecture required to handle real cloud credentials safely.
 
+**Current prototype note:** Multi-agent reasoning already uses **Claude through Amazon Bedrock** (not the direct Anthropic API). Future phases below extend Bedrock usage (e.g. Knowledge Bases, Titan embeddings) in the same AWS-native direction.
+
 ---
 
 ## Phase 1: Secure Cloud Connectivity (Weeks 1–4)
