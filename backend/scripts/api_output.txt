@@ -1,0 +1,231 @@
+﻿{
+    "gcp_monthly_total":  9258.8,
+    "aws_monthly_ondemand":  8801.45,
+    "aws_monthly_optimized":  6095.49,
+    "total_monthly_savings":  2705.96,
+    "total_first_year_savings":  32471.57,
+    "savings_vs_observation_window":  8117.89,
+    "ri_recommendations":  [
+                               {
+                                   "aws_service":  "RDS",
+                                   "instance_type":  "db.m5.2xlarge",
+                                   "quantity":  4,
+                                   "term":  "1-year",
+                                   "payment_option":  "All Upfront",
+                                   "monthly_ondemand_cost":  1997.28,
+                                   "monthly_ri_cost":  1198.37,
+                                   "monthly_savings":  798.91,
+                                   "annual_savings":  9586.94,
+                                   "rationale":  "4 database instance(s) running continuously. Reserved Instance gives ~40% savings."
+                               },
+                               {
+                                   "aws_service":  "EC2",
+                                   "instance_type":  "m5.4xlarge",
+                                   "quantity":  9,
+                                   "term":  "1-year",
+                                   "payment_option":  "All Upfront",
+                                   "monthly_ondemand_cost":  5045.76,
+                                   "monthly_ri_cost":  3178.57,
+                                   "monthly_savings":  1867.19,
+                                   "annual_savings":  22406.33,
+                                   "rationale":  "9 instance(s) running 24/7 with steady utilisation. RI gives ~37% savings."
+                               },
+                               {
+                                   "aws_service":  "ElastiCache",
+                                   "instance_type":  "cache.m5.large",
+                                   "quantity":  1,
+                                   "term":  "1-year",
+                                   "payment_option":  "All Upfront",
+                                   "monthly_ondemand_cost":  113.88,
+                                   "monthly_ri_cost":  74.02,
+                                   "monthly_savings":  39.86,
+                                   "annual_savings":  478.3,
+                                   "rationale":  "Cache runs continuously. Reserved node gives ~35% savings."
+                               }
+                           ],
+    "cost_comparison":  [
+                            {
+                                "month":  "2024-01",
+                                "gcp_cost":  9171.97,
+                                "aws_ondemand":  8718.91,
+                                "aws_optimized":  6038.33
+                            },
+                            {
+                                "month":  "2024-02",
+                                "gcp_cost":  9217.64,
+                                "aws_ondemand":  8762.32,
+                                "aws_optimized":  6068.39
+                            },
+                            {
+                                "month":  "2024-03",
+                                "gcp_cost":  9282.21,
+                                "aws_ondemand":  8823.7,
+                                "aws_optimized":  6110.9
+                            },
+                            {
+                                "month":  "2024-04",
+                                "gcp_cost":  9192.12,
+                                "aws_ondemand":  8738.06,
+                                "aws_optimized":  6051.59
+                            },
+                            {
+                                "month":  "2024-05",
+                                "gcp_cost":  9295.34,
+                                "aws_ondemand":  8836.19,
+                                "aws_optimized":  6119.55
+                            },
+                            {
+                                "month":  "2024-06",
+                                "gcp_cost":  9222.28,
+                                "aws_ondemand":  8766.73,
+                                "aws_optimized":  6071.45
+                            },
+                            {
+                                "month":  "2024-07",
+                                "gcp_cost":  9106.28,
+                                "aws_ondemand":  8656.46,
+                                "aws_optimized":  5995.08
+                            },
+                            {
+                                "month":  "2024-08",
+                                "gcp_cost":  9064.31,
+                                "aws_ondemand":  8616.57,
+                                "aws_optimized":  5967.45
+                            },
+                            {
+                                "month":  "2024-09",
+                                "gcp_cost":  9401.67,
+                                "aws_ondemand":  8937.26,
+                                "aws_optimized":  6189.55
+                            },
+                            {
+                                "month":  "2024-10",
+                                "gcp_cost":  9415.56,
+                                "aws_ondemand":  8950.47,
+                                "aws_optimized":  6198.69
+                            },
+                            {
+                                "month":  "2024-11",
+                                "gcp_cost":  9257.22,
+                                "aws_ondemand":  8799.95,
+                                "aws_optimized":  6094.45
+                            },
+                            {
+                                "month":  "2024-12",
+                                "gcp_cost":  9479.01,
+                                "aws_ondemand":  9010.78,
+                                "aws_optimized":  6240.46
+                            }
+                        ],
+    "usage_patterns":  [
+                           {
+                               "gcp_service":  "BigQuery",
+                               "pattern":  "steady_state",
+                               "avg_monthly_cost":  664.39,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.142,
+                               "recommendation":  "reserved_instance",
+                               "description":  "BigQuery runs near-continuously with low variance (CV=0.14). Ideal candidate for Reserved Instances."
+                           },
+                           {
+                               "gcp_service":  "Cloud Functions",
+                               "pattern":  "bursty",
+                               "avg_monthly_cost":  62.22,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.356,
+                               "recommendation":  "on_demand",
+                               "description":  "Cloud Functions has variable usage (CV=0.36). Keep on-demand for cost efficiency."
+                           },
+                           {
+                               "gcp_service":  "Cloud Pub/Sub",
+                               "pattern":  "predictable",
+                               "avg_monthly_cost":  93.4,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.171,
+                               "recommendation":  "savings_plan",
+                               "description":  "Cloud Pub/Sub shows predictable usage patterns. Savings Plans provide flexibility with discount."
+                           },
+                           {
+                               "gcp_service":  "Cloud Run",
+                               "pattern":  "bursty",
+                               "avg_monthly_cost":  227.66,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.472,
+                               "recommendation":  "on_demand",
+                               "description":  "Cloud Run has variable usage (CV=0.47). Keep on-demand for cost efficiency."
+                           },
+                           {
+                               "gcp_service":  "Cloud SQL",
+                               "pattern":  "steady_state",
+                               "avg_monthly_cost":  1900.09,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.025,
+                               "recommendation":  "reserved_instance",
+                               "description":  "Cloud SQL runs near-continuously with low variance (CV=0.02). Ideal candidate for Reserved Instances."
+                           },
+                           {
+                               "gcp_service":  "Cloud Storage",
+                               "pattern":  "steady_state",
+                               "avg_monthly_cost":  230.22,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.035,
+                               "recommendation":  "reserved_instance",
+                               "description":  "Cloud Storage runs near-continuously with low variance (CV=0.04). Ideal candidate for Reserved Instances."
+                           },
+                           {
+                               "gcp_service":  "Compute Engine",
+                               "pattern":  "steady_state",
+                               "avg_monthly_cost":  5171.64,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.009,
+                               "recommendation":  "reserved_instance",
+                               "description":  "Compute Engine runs near-continuously with low variance (CV=0.01). Ideal candidate for Reserved Instances."
+                           },
+                           {
+                               "gcp_service":  "Memorystore",
+                               "pattern":  "steady_state",
+                               "avg_monthly_cost":  570.59,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.031,
+                               "recommendation":  "reserved_instance",
+                               "description":  "Memorystore runs near-continuously with low variance (CV=0.03). Ideal candidate for Reserved Instances."
+                           },
+                           {
+                               "gcp_service":  "Networking",
+                               "pattern":  "steady_state",
+                               "avg_monthly_cost":  338.59,
+                               "avg_daily_hours":  24.0,
+                               "peak_utilization_pct":  100,
+                               "coefficient_of_variation":  0.12,
+                               "recommendation":  "reserved_instance",
+                               "description":  "Networking runs near-continuously with low variance (CV=0.12). Ideal candidate for Reserved Instances."
+                           }
+                       ],
+    "optimizer_recommendations":  [
+
+                                  ],
+    "pricing_sources":  {
+                            "aws_pricing_api":  "fallback_table",
+                            "cost_explorer":  "not_connected",
+                            "compute_optimizer":  "heuristic"
+                        },
+    "watchdog_baseline":  {
+                              "projected_monthly_aws_spend":  6095.49,
+                              "target_monthly_savings":  2705.96,
+                              "alert_threshold_pct":  12,
+                              "top_cost_services":  [
+                                                        "EC2",
+                                                        "RDS",
+                                                        "Athena"
+                                                    ]
+                          },
+    "summary":  "Your current GCP environment costs approximately $9,258.80/month. After migration to AWS, projected cost is $8,801.45/month at on-demand rates, or $6,095.49/month with Day-0 RI optimisations â a 31% reduction.\n\nRecommended Day-0 purchases:\n  â¢ Purchase 4Ã db.m5.2xlarge RDS Reserved Instance (1-year, All Upfront) â saves $9,586.94/year\n  â¢ Purchase 9Ã m5.4xlarge EC2 Reserved Instance (1-year, All Upfront) â saves $22,406.33/year\n  â¢ Purchase 1Ã cache.m5.large ElastiCache Reserved Instance (1-year, All Upfront) â saves $478.30/year\n\nEstimated first-year savings: $32,471.57. A traditional FinOps tool would require a 3-month observation window before making these same recommendations, costing you $8,117.89 in unnecessary on-demand spend."
+}

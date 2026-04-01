@@ -1,0 +1,109 @@
+Service description,SKU description,Usage start date,Usage end date,Usage amount,Usage unit,Cost ($)
+Compute Engine,N1 Standard-4 Instance running,2024-01-01,2024-01-30,740.08,hour,140.61
+Compute Engine,N1 Standard-4 Instance running,2024-01-01,2024-01-30,651.6,hour,123.8
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-01-01,2024-01-30,687.6,hour,178.78
+Cloud Storage,Standard Storage US Multi-region,2024-01-01,2024-01-30,956.25,gibibyte month,24.86
+Cloud Run,CPU Allocation Time,2024-01-01,2024-01-30,1604706.82,vcpu-second,38.51
+Cloud Functions,CPU Time,2024-01-01,2024-01-30,1273.69,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-01-01,2024-01-30,1424.53,mebibyte,56.98
+BigQuery,Analysis Bytes Processed,2024-01-01,2024-01-30,860.86,tebibyte,4304.29
+Networking,Network Egress via Carrier Peering,2024-01-01,2024-01-30,1095.35,gibibyte,93.1
+Compute Engine,N1 Standard-4 Instance running,2024-02-01,2024-03-01,652.29,hour,123.94
+Compute Engine,N1 Standard-4 Instance running,2024-02-01,2024-03-01,679.48,hour,129.1
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-02-01,2024-03-01,720.77,hour,187.4
+Cloud Storage,Standard Storage US Multi-region,2024-02-01,2024-03-01,818.58,gibibyte month,21.28
+Cloud Run,CPU Allocation Time,2024-02-01,2024-03-01,798256.48,vcpu-second,19.16
+Cloud Functions,CPU Time,2024-02-01,2024-03-01,1254.92,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-02-01,2024-03-01,1181.46,mebibyte,47.26
+BigQuery,Analysis Bytes Processed,2024-02-01,2024-03-01,954.31,tebibyte,4771.54
+Networking,Network Egress via Carrier Peering,2024-02-01,2024-03-01,1212.49,gibibyte,103.06
+Compute Engine,N1 Standard-4 Instance running,2024-03-01,2024-03-30,764.56,hour,145.27
+Compute Engine,N1 Standard-4 Instance running,2024-03-01,2024-03-30,648.94,hour,123.3
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-03-01,2024-03-30,764.04,hour,198.65
+Cloud Storage,Standard Storage US Multi-region,2024-03-01,2024-03-30,1288.7,gibibyte month,33.51
+Cloud Run,CPU Allocation Time,2024-03-01,2024-03-30,1010375.77,vcpu-second,24.25
+Cloud Functions,CPU Time,2024-03-01,2024-03-30,908.84,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-03-01,2024-03-30,1470.05,mebibyte,58.8
+BigQuery,Analysis Bytes Processed,2024-03-01,2024-03-30,1035.62,tebibyte,5178.08
+Networking,Network Egress via Carrier Peering,2024-03-01,2024-03-30,864.92,gibibyte,73.52
+Compute Engine,N1 Standard-4 Instance running,2024-04-01,2024-04-30,661.93,hour,125.77
+Compute Engine,N1 Standard-4 Instance running,2024-04-01,2024-04-30,770.04,hour,146.31
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-04-01,2024-04-30,734.94,hour,191.08
+Cloud Storage,Standard Storage US Multi-region,2024-04-01,2024-04-30,1364.99,gibibyte month,35.49
+Cloud Run,CPU Allocation Time,2024-04-01,2024-04-30,1594597.68,vcpu-second,38.27
+Cloud Functions,CPU Time,2024-04-01,2024-04-30,1175.36,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-04-01,2024-04-30,1481.18,mebibyte,59.25
+BigQuery,Analysis Bytes Processed,2024-04-01,2024-04-30,1064.97,tebibyte,5324.87
+Networking,Network Egress via Carrier Peering,2024-04-01,2024-04-30,1186.43,gibibyte,100.85
+Compute Engine,N1 Standard-4 Instance running,2024-05-01,2024-05-30,767.43,hour,145.81
+Compute Engine,N1 Standard-4 Instance running,2024-05-01,2024-05-30,737.07,hour,140.04
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-05-01,2024-05-30,772.09,hour,200.74
+Cloud Storage,Standard Storage US Multi-region,2024-05-01,2024-05-30,1204.15,gibibyte month,31.31
+Cloud Run,CPU Allocation Time,2024-05-01,2024-05-30,1556857.75,vcpu-second,37.36
+Cloud Functions,CPU Time,2024-05-01,2024-05-30,832.08,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-05-01,2024-05-30,959.53,mebibyte,38.38
+BigQuery,Analysis Bytes Processed,2024-05-01,2024-05-30,1002.57,tebibyte,5012.86
+Networking,Network Egress via Carrier Peering,2024-05-01,2024-05-30,855.85,gibibyte,72.75
+Compute Engine,N1 Standard-4 Instance running,2024-06-01,2024-06-30,681.52,hour,129.49
+Compute Engine,N1 Standard-4 Instance running,2024-06-01,2024-06-30,662.54,hour,125.88
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-06-01,2024-06-30,688.03,hour,178.89
+Cloud Storage,Standard Storage US Multi-region,2024-06-01,2024-06-30,1244.98,gibibyte month,32.37
+Cloud Run,CPU Allocation Time,2024-06-01,2024-06-30,1047248.27,vcpu-second,25.13
+Cloud Functions,CPU Time,2024-06-01,2024-06-30,1059.13,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-06-01,2024-06-30,946.65,mebibyte,37.87
+BigQuery,Analysis Bytes Processed,2024-06-01,2024-06-30,986.88,tebibyte,4934.42
+Networking,Network Egress via Carrier Peering,2024-06-01,2024-06-30,1455.66,gibibyte,123.73
+Compute Engine,N1 Standard-4 Instance running,2024-07-01,2024-07-30,741.32,hour,140.85
+Compute Engine,N1 Standard-4 Instance running,2024-07-01,2024-07-30,735.71,hour,139.79
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-07-01,2024-07-30,672.64,hour,174.89
+Cloud Storage,Standard Storage US Multi-region,2024-07-01,2024-07-30,1310.39,gibibyte month,34.07
+Cloud Run,CPU Allocation Time,2024-07-01,2024-07-30,745103.74,vcpu-second,17.88
+Cloud Functions,CPU Time,2024-07-01,2024-07-30,1065.62,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-07-01,2024-07-30,1492.67,mebibyte,59.71
+BigQuery,Analysis Bytes Processed,2024-07-01,2024-07-30,1248.0,tebibyte,6240.0
+Networking,Network Egress via Carrier Peering,2024-07-01,2024-07-30,1189.86,gibibyte,101.14
+Compute Engine,N1 Standard-4 Instance running,2024-08-01,2024-08-30,746.58,hour,141.85
+Compute Engine,N1 Standard-4 Instance running,2024-08-01,2024-08-30,769.37,hour,146.18
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-08-01,2024-08-30,759.74,hour,197.53
+Cloud Storage,Standard Storage US Multi-region,2024-08-01,2024-08-30,960.33,gibibyte month,24.97
+Cloud Run,CPU Allocation Time,2024-08-01,2024-08-30,548150.37,vcpu-second,13.16
+Cloud Functions,CPU Time,2024-08-01,2024-08-30,1020.82,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-08-01,2024-08-30,987.42,mebibyte,39.5
+BigQuery,Analysis Bytes Processed,2024-08-01,2024-08-30,947.69,tebibyte,4738.44
+Networking,Network Egress via Carrier Peering,2024-08-01,2024-08-30,1460.04,gibibyte,124.1
+Compute Engine,N1 Standard-4 Instance running,2024-09-01,2024-09-30,774.2,hour,147.1
+Compute Engine,N1 Standard-4 Instance running,2024-09-01,2024-09-30,693.31,hour,131.73
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-09-01,2024-09-30,742.38,hour,193.02
+Cloud Storage,Standard Storage US Multi-region,2024-09-01,2024-09-30,1076.94,gibibyte month,28.0
+Cloud Run,CPU Allocation Time,2024-09-01,2024-09-30,1871821.38,vcpu-second,44.92
+Cloud Functions,CPU Time,2024-09-01,2024-09-30,1121.2,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-09-01,2024-09-30,985.42,mebibyte,39.42
+BigQuery,Analysis Bytes Processed,2024-09-01,2024-09-30,972.64,tebibyte,4863.2
+Networking,Network Egress via Carrier Peering,2024-09-01,2024-09-30,1192.96,gibibyte,101.4
+Compute Engine,N1 Standard-4 Instance running,2024-10-01,2024-10-30,685.83,hour,130.31
+Compute Engine,N1 Standard-4 Instance running,2024-10-01,2024-10-30,732.18,hour,139.11
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-10-01,2024-10-30,777.29,hour,202.09
+Cloud Storage,Standard Storage US Multi-region,2024-10-01,2024-10-30,1079.58,gibibyte month,28.07
+Cloud Run,CPU Allocation Time,2024-10-01,2024-10-30,828981.14,vcpu-second,19.9
+Cloud Functions,CPU Time,2024-10-01,2024-10-30,1498.28,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-10-01,2024-10-30,1156.67,mebibyte,46.27
+BigQuery,Analysis Bytes Processed,2024-10-01,2024-10-30,863.64,tebibyte,4318.18
+Networking,Network Egress via Carrier Peering,2024-10-01,2024-10-30,832.98,gibibyte,70.8
+Compute Engine,N1 Standard-4 Instance running,2024-11-01,2024-11-30,663.79,hour,126.12
+Compute Engine,N1 Standard-4 Instance running,2024-11-01,2024-11-30,738.35,hour,140.29
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-11-01,2024-11-30,762.06,hour,198.14
+Cloud Storage,Standard Storage US Multi-region,2024-11-01,2024-11-30,1095.51,gibibyte month,28.48
+Cloud Run,CPU Allocation Time,2024-11-01,2024-11-30,595291.56,vcpu-second,14.29
+Cloud Functions,CPU Time,2024-11-01,2024-11-30,1067.13,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-11-01,2024-11-30,1497.28,mebibyte,59.89
+BigQuery,Analysis Bytes Processed,2024-11-01,2024-11-30,1170.38,tebibyte,5851.9
+Networking,Network Egress via Carrier Peering,2024-11-01,2024-11-30,1479.75,gibibyte,125.78
+Compute Engine,N1 Standard-4 Instance running,2024-12-01,2024-12-30,771.95,hour,146.67
+Compute Engine,N1 Standard-4 Instance running,2024-12-01,2024-12-30,649.65,hour,123.43
+Cloud SQL,Cloud SQL for PostgreSQL: Standard 2,2024-12-01,2024-12-30,751.78,hour,195.46
+Cloud Storage,Standard Storage US Multi-region,2024-12-01,2024-12-30,1277.2,gibibyte month,33.21
+Cloud Run,CPU Allocation Time,2024-12-01,2024-12-30,1305455.5,vcpu-second,31.33
+Cloud Functions,CPU Time,2024-12-01,2024-12-30,986.78,GHz-second,0.01
+Cloud Pub/Sub,Message Delivery Basic,2024-12-01,2024-12-30,1248.67,mebibyte,49.95
+BigQuery,Analysis Bytes Processed,2024-12-01,2024-12-30,878.09,tebibyte,4390.43
+Networking,Network Egress via Carrier Peering,2024-12-01,2024-12-30,1104.34,gibibyte,93.87
