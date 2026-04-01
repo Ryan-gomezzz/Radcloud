@@ -5,9 +5,11 @@ import json
 import logging
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, NoCredentialsError
 
 logger = logging.getLogger(__name__)
+
+_logged_no_credentials = False
 
 _EMBEDDING_MODEL_ID = "amazon.titan-embed-text-v2:0"
 _EMBEDDING_DIM = 1024  # Titan v2 output dimension
@@ -15,6 +17,7 @@ _EMBEDDING_DIM = 1024  # Titan v2 output dimension
 
 def get_embedding(text: str, region: str = "us-east-1") -> list[float] | None:
     """Return embedding vector for a text string using Bedrock Titan v2."""
+    global _logged_no_credentials
     try:
         client = boto3.client("bedrock-runtime", region_name=region)
         body = json.dumps({
@@ -30,10 +33,26 @@ def get_embedding(text: str, region: str = "us-east-1") -> list[float] | None:
         )
         result = json.loads(response["body"].read())
         return result.get("embedding")
+    except NoCredentialsError:
+        if not _logged_no_credentials:
+            _logged_no_credentials = True
+            logger.info(
+                "Bedrock embeddings disabled (no AWS credentials). "
+                "Set AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY for RAG, or use DEMO_MODE=true."
+            )
+        return None
     except ClientError as e:
         logger.warning("Bedrock embedding failed: %s", e)
         return None
     except Exception as e:
+        if "Unable to locate credentials" in str(e):
+            if not _logged_no_credentials:
+                _logged_no_credentials = True
+                logger.info(
+                    "Bedrock embeddings disabled (no AWS credentials). "
+                    "Set AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY for RAG, or use DEMO_MODE=true."
+                )
+            return None
         logger.warning("Embedding error: %s", e)
         return None
 

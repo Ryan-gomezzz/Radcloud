@@ -9,8 +9,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -32,7 +32,6 @@ _SECRET = (
 _ALGORITHM = "HS256"
 _TOKEN_EXPIRE_DAYS = 30
 
-_pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 _bearer = HTTPBearer(auto_error=False)
 
 
@@ -68,11 +67,21 @@ class TokenResponse(BaseModel):
 # ---------- Helpers ----------
 
 def _hash_password(plain: str) -> str:
-    return _pwd_ctx.hash(plain)
+    data = plain.encode("utf-8")
+    if len(data) > 72:
+        data = data[:72]
+    return bcrypt.hashpw(data, bcrypt.gensalt()).decode("ascii")
 
 
 def _verify_password(plain: str, hashed: str) -> bool:
-    return _pwd_ctx.verify(plain, hashed)
+    try:
+        h = hashed.encode("utf-8")
+    except (UnicodeEncodeError, AttributeError):
+        return False
+    data = plain.encode("utf-8")
+    if len(data) > 72:
+        data = data[:72]
+    return bcrypt.checkpw(data, h)
 
 
 def _create_token(user_id: str) -> str:
