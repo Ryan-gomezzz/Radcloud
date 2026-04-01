@@ -1,8 +1,4 @@
 {
-  "gcp_config_raw": "",
-  "gcp_billing_raw": [],
-  "status": "complete",
-  "errors": [],
   "gcp_inventory": [
     {
       "resource_id": "web-server-1",
@@ -322,7 +318,31 @@
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_instance",
+        "module": "modules/compute/ec2",
+        "required_inputs": [
+          "instance_type",
+          "subnet_id",
+          "security_group_ids",
+          "ami"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "CPUUtilization",
+          "NetworkIn",
+          "NetworkOut",
+          "StatusCheckFailed",
+          "DiskReadOps",
+          "DiskWriteOps"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "high",
+      "target_runtime": "ec2"
     },
     {
       "gcp_resource_id": "web-server-2",
@@ -339,7 +359,31 @@
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_instance",
+        "module": "modules/compute/ec2",
+        "required_inputs": [
+          "instance_type",
+          "subnet_id",
+          "security_group_ids",
+          "ami"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "CPUUtilization",
+          "NetworkIn",
+          "NetworkOut",
+          "StatusCheckFailed",
+          "DiskReadOps",
+          "DiskWriteOps"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "high",
+      "target_runtime": "ec2"
     },
     {
       "gcp_resource_id": "payment-worker-1",
@@ -356,7 +400,31 @@
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_instance",
+        "module": "modules/compute/ec2",
+        "required_inputs": [
+          "instance_type",
+          "subnet_id",
+          "security_group_ids",
+          "ami"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "CPUUtilization",
+          "NetworkIn",
+          "NetworkOut",
+          "StatusCheckFailed",
+          "DiskReadOps",
+          "DiskWriteOps"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "high",
+      "target_runtime": "ec2"
     },
     {
       "gcp_resource_id": "novapay-primary-db",
@@ -366,14 +434,44 @@
       "aws_service": "RDS",
       "aws_type": "db_instance",
       "aws_config": {
-        "instance_class": "db.m5.xlarge",
+        "instance_type": "db.m5.xlarge",
         "region": "us-east-1",
         "engine": "postgres",
-        "multi_az": true
+        "engine_version": "14",
+        "multi_az": true,
+        "allocated_storage_gb": 500,
+        "replica_of": null
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_db_instance",
+        "module": "modules/database/rds",
+        "required_inputs": [
+          "instance_class",
+          "engine",
+          "engine_version",
+          "allocated_storage",
+          "db_subnet_group_name",
+          "vpc_security_group_ids"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "CPUUtilization",
+          "FreeableMemory",
+          "DatabaseConnections",
+          "ReadIOPS",
+          "WriteIOPS",
+          "FreeStorageSpace",
+          "ReplicaLag"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "high",
+      "target_runtime": "rds"
     },
     {
       "gcp_resource_id": "novapay-replica-db",
@@ -383,14 +481,44 @@
       "aws_service": "RDS",
       "aws_type": "db_instance",
       "aws_config": {
-        "instance_class": "db.m5.large",
+        "instance_type": "db.m5.large",
         "region": "us-east-1",
         "engine": "postgres",
-        "multi_az": false
+        "engine_version": "14",
+        "multi_az": false,
+        "allocated_storage_gb": 500,
+        "replica_of": "novapay-primary-db"
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_db_instance",
+        "module": "modules/database/rds",
+        "required_inputs": [
+          "instance_class",
+          "engine",
+          "engine_version",
+          "allocated_storage",
+          "db_subnet_group_name",
+          "vpc_security_group_ids"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "CPUUtilization",
+          "FreeableMemory",
+          "DatabaseConnections",
+          "ReadIOPS",
+          "WriteIOPS",
+          "FreeStorageSpace",
+          "ReplicaLag"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "high",
+      "target_runtime": "rds"
     },
     {
       "gcp_resource_id": "novapay-redis",
@@ -402,11 +530,37 @@
       "aws_config": {
         "node_type": "cache.r6g.large",
         "region": "us-east-1",
-        "num_nodes": 2
+        "num_nodes": 2,
+        "engine_version": "6.x"
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_elasticache_replication_group",
+        "module": "modules/database/elasticache",
+        "required_inputs": [
+          "replication_group_id",
+          "node_type",
+          "number_cache_clusters",
+          "subnet_group_name",
+          "security_group_ids"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "CPUUtilization",
+          "EngineCPUUtilization",
+          "CurrConnections",
+          "CacheHitRate",
+          "Evictions",
+          "ReplicationLag"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "high",
+      "target_runtime": "elasticache"
     },
     {
       "gcp_resource_id": "novapay-assets",
@@ -422,7 +576,28 @@
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_s3_bucket",
+        "module": "modules/storage/s3",
+        "required_inputs": [
+          "bucket",
+          "acl"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "BucketSizeBytes",
+          "NumberOfObjects",
+          "AllRequests",
+          "4xxErrors",
+          "5xxErrors"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "low",
+      "target_runtime": "s3"
     },
     {
       "gcp_resource_id": "novapay-logs",
@@ -438,7 +613,28 @@
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_s3_bucket",
+        "module": "modules/storage/s3",
+        "required_inputs": [
+          "bucket",
+          "acl"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "BucketSizeBytes",
+          "NumberOfObjects",
+          "AllRequests",
+          "4xxErrors",
+          "5xxErrors"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "low",
+      "target_runtime": "s3"
     },
     {
       "gcp_resource_id": "novapay-backups",
@@ -448,13 +644,34 @@
       "aws_service": "S3",
       "aws_type": "bucket",
       "aws_config": {
-        "storage_class": "STANDARD",
+        "storage_class": "GLACIER_IR",
         "region": "us-east-1",
         "versioning": true
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_s3_bucket",
+        "module": "modules/storage/s3",
+        "required_inputs": [
+          "bucket",
+          "acl"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "BucketSizeBytes",
+          "NumberOfObjects",
+          "AllRequests",
+          "4xxErrors",
+          "5xxErrors"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "low",
+      "target_runtime": "s3"
     },
     {
       "gcp_resource_id": "novapay-api",
@@ -464,13 +681,38 @@
       "aws_service": "ECS Fargate",
       "aws_type": "service",
       "aws_config": {
-        "cpu": "1024",
-        "memory": "2048",
-        "region": "us-east-1"
+        "cpu": "2",
+        "memory": "2Gi",
+        "region": "us-east-1",
+        "min_instances": 1,
+        "max_instances": 20
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_ecs_service",
+        "module": "modules/compute/ecs-fargate",
+        "required_inputs": [
+          "cluster",
+          "task_definition",
+          "desired_count",
+          "subnets",
+          "security_groups"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "CPUUtilization",
+          "MemoryUtilization",
+          "RunningTaskCount",
+          "RequestCount"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "high",
+      "target_runtime": "fargate"
     },
     {
       "gcp_resource_id": "webhook-ingest-fn",
@@ -481,11 +723,37 @@
       "aws_type": "function",
       "aws_config": {
         "memory_mb": 512,
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "runtime": "python311",
+        "trigger": "http"
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_lambda_function",
+        "module": "modules/compute/lambda",
+        "required_inputs": [
+          "function_name",
+          "handler",
+          "runtime",
+          "role",
+          "filename"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "Invocations",
+          "Errors",
+          "Duration",
+          "Throttles",
+          "ConcurrentExecutions"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "lambda"
     },
     {
       "gcp_resource_id": "settlement-cron-fn",
@@ -496,11 +764,37 @@
       "aws_type": "function",
       "aws_config": {
         "memory_mb": 1024,
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "runtime": "python311",
+        "trigger": "pubsub"
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_lambda_function",
+        "module": "modules/compute/lambda",
+        "required_inputs": [
+          "function_name",
+          "handler",
+          "runtime",
+          "role",
+          "filename"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "Invocations",
+          "Errors",
+          "Duration",
+          "Throttles",
+          "ConcurrentExecutions"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "lambda"
     },
     {
       "gcp_resource_id": "payment-events",
@@ -514,7 +808,24 @@
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_sns_topic",
+        "module": "modules/messaging/sns",
+        "required_inputs": [
+          "name"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "NumberOfMessagesPublished",
+          "PublishSize"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "sns"
     },
     {
       "gcp_resource_id": "payment-events-sub",
@@ -524,11 +835,31 @@
       "aws_service": "SQS",
       "aws_type": "queue",
       "aws_config": {
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "topic": "payment-events"
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "BigQuery streaming subscription patterns may require Kinesis Firehose + S3 + Athena."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_sqs_queue",
+        "module": "modules/messaging/sqs",
+        "required_inputs": [
+          "name",
+          "visibility_timeout_seconds"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "ApproximateNumberOfMessagesVisible",
+          "ApproximateAgeOfOldestMessage",
+          "NumberOfMessagesReceived"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "sqs"
     },
     {
       "gcp_resource_id": "novapay_analytics",
@@ -539,11 +870,29 @@
       "aws_type": "workgroup",
       "aws_config": {
         "region": "us-east-1",
-        "output_location": "s3://novapay-athena-results/"
+        "output_location": "s3://novapay_analytics-athena-results/"
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "Dataset-level ACLs and analytics semantics differ; evaluate Redshift Serverless for BI."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_athena_workgroup",
+        "module": "modules/analytics/athena",
+        "required_inputs": [
+          "name",
+          "configuration"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [
+          "ProcessedBytes",
+          "TotalExecutionTime"
+        ],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "athena"
     },
     {
       "gcp_resource_id": "transactions_curated",
@@ -554,11 +903,29 @@
       "aws_type": "table",
       "aws_config": {
         "format": "parquet",
-        "partitioning": "DAY"
+        "partitioning": "DAY",
+        "dataset_id": "novapay_analytics"
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_glue_catalog_table",
+        "module": "modules/analytics/glue",
+        "required_inputs": [
+          "name",
+          "database_name",
+          "table_type",
+          "storage_descriptor"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "low",
+      "target_runtime": "glue"
     },
     {
       "gcp_resource_id": "novapay-vpc",
@@ -569,11 +936,28 @@
       "aws_type": "vpc",
       "aws_config": {
         "cidr": "10.0.0.0/16",
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "enable_dns": true
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_vpc",
+        "module": "modules/networking/vpc",
+        "required_inputs": [
+          "cidr_block",
+          "enable_dns_support",
+          "enable_dns_hostnames"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "low",
+      "target_runtime": "networking"
     },
     {
       "gcp_resource_id": "private-app-subnet",
@@ -583,12 +967,29 @@
       "aws_service": "VPC",
       "aws_type": "subnet",
       "aws_config": {
+        "cidr": "10.0.1.0/24",
         "region": "us-east-1",
         "map_public_ip": false
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_subnet",
+        "module": "modules/networking/subnets",
+        "required_inputs": [
+          "vpc_id",
+          "cidr_block",
+          "availability_zone"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "low",
+      "target_runtime": "networking"
     },
     {
       "gcp_resource_id": "private-db-subnet",
@@ -598,54 +999,145 @@
       "aws_service": "VPC",
       "aws_type": "subnet",
       "aws_config": {
+        "cidr": "10.0.2.0/24",
         "region": "us-east-1",
         "map_public_ip": false
       },
       "mapping_confidence": "direct",
       "gap_flag": false,
-      "gap_notes": null
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_subnet",
+        "module": "modules/networking/subnets",
+        "required_inputs": [
+          "vpc_id",
+          "cidr_block",
+          "availability_zone"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "low",
+      "target_runtime": "networking"
     },
     {
       "gcp_resource_id": "fw-allow-internal",
       "gcp_service": "VPC Firewall",
       "gcp_type": "firewall_rule",
       "gcp_config_summary": "direction=INGRESS, ports=['tcp:0-65535'], source_ranges=['10.0.0.0/16']",
-      "aws_service": "VPC",
+      "aws_service": "VPC Security Groups + NACLs",
       "aws_type": "security_group_rule",
       "aws_config": {
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "direction": "INGRESS",
+        "ports": [
+          "tcp:0-65535"
+        ],
+        "source_ranges": [
+          "10.0.0.0/16"
+        ]
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "GCP network-level firewall with tags \u2192 AWS SG + NACL redesign required."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_security_group_rule",
+        "module": "modules/networking/security-groups",
+        "required_inputs": [
+          "security_group_id",
+          "type",
+          "from_port",
+          "to_port",
+          "protocol",
+          "cidr_blocks"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "other"
     },
     {
       "gcp_resource_id": "fw-allow-https",
       "gcp_service": "VPC Firewall",
       "gcp_type": "firewall_rule",
       "gcp_config_summary": "direction=INGRESS, ports=['tcp:443'], source_ranges=['0.0.0.0/0'], target_tags=['web']",
-      "aws_service": "VPC",
+      "aws_service": "VPC Security Groups + NACLs",
       "aws_type": "security_group_rule",
       "aws_config": {
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "direction": "INGRESS",
+        "ports": [
+          "tcp:443"
+        ],
+        "source_ranges": [
+          "0.0.0.0/0"
+        ]
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "GCP network-level firewall with tags \u2192 AWS SG + NACL redesign required."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_security_group_rule",
+        "module": "modules/networking/security-groups",
+        "required_inputs": [
+          "security_group_id",
+          "type",
+          "from_port",
+          "to_port",
+          "protocol",
+          "cidr_blocks"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "other"
     },
     {
       "gcp_resource_id": "fw-deny-all-egress-default",
       "gcp_service": "VPC Firewall",
       "gcp_type": "firewall_rule",
       "gcp_config_summary": "direction=EGRESS, deny=True, target_tags=['db']",
-      "aws_service": "VPC",
+      "aws_service": "VPC Security Groups + NACLs",
       "aws_type": "security_group_rule",
       "aws_config": {
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "direction": "EGRESS",
+        "ports": [],
+        "source_ranges": []
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "GCP network-level firewall with tags \u2192 AWS SG + NACL redesign required."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_security_group_rule",
+        "module": "modules/networking/security-groups",
+        "required_inputs": [
+          "security_group_id",
+          "type",
+          "from_port",
+          "to_port",
+          "protocol",
+          "cidr_blocks"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "other"
     },
     {
       "gcp_resource_id": "sa-api-runtime",
@@ -655,11 +1147,27 @@
       "aws_service": "IAM",
       "aws_type": "role",
       "aws_config": {
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "account_id": "novapay-api-runtime"
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "GCP SA keys vs AWS IAM roles; workload identity patterns differ."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_iam_role",
+        "module": "modules/iam",
+        "required_inputs": [
+          "name",
+          "assume_role_policy"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "iam"
     },
     {
       "gcp_resource_id": "sa-batch-worker",
@@ -669,11 +1177,27 @@
       "aws_service": "IAM",
       "aws_type": "role",
       "aws_config": {
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "account_id": "novapay-batch"
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "GCP SA keys vs AWS IAM roles; workload identity patterns differ."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_iam_role",
+        "module": "modules/iam",
+        "required_inputs": [
+          "name",
+          "assume_role_policy"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "iam"
     },
     {
       "gcp_resource_id": "iam-cloudsql-client",
@@ -683,43 +1207,63 @@
       "aws_service": "IAM",
       "aws_type": "policy_attachment",
       "aws_config": {
-        "region": "us-east-1"
+        "region": "us-east-1",
+        "role": "roles/cloudsql.client",
+        "members": [
+          "serviceAccount:novapay-api-runtime@*.iam.gserviceaccount.com"
+        ]
       },
       "mapping_confidence": "partial",
       "gap_flag": true,
-      "gap_notes": "Project-level bindings must map to account-scoped IAM policies."
+      "gap_notes": null,
+      "terraform_hints": {
+        "resource_type": "aws_iam_role_policy_attachment",
+        "module": "modules/iam",
+        "required_inputs": [
+          "role",
+          "policy_arn"
+        ]
+      },
+      "observability_hooks": {
+        "metrics": [],
+        "log_group": null,
+        "alarms": []
+      },
+      "watchdog_priority": "medium",
+      "target_runtime": "iam"
     }
   ],
   "aws_architecture": {
     "summary": "NovaPay's target AWS architecture lands in a single production VPC in us-east-1 with three isolated tiers: public edge (ALB only), private application subnets for EC2 web and ECS Fargate API workloads, and private database subnets for Multi-AZ RDS PostgreSQL. ElastiCache Redis replaces Memorystore for session and rate-limit data. GCS maps to versioned S3 buckets with lifecycle policies mirroring Nearline/Coldline economics. Cloud Run becomes an ECS Fargate service behind an internal ALB; Cloud Functions become Lambda with EventBridge and SQS triggers. Pub/Sub maps to SNS topics fanning into SQS queues; BigQuery analytics land on Athena + S3 curated data lake with optional Redshift Serverless for heavy aggregation. Firewall tag semantics are rebuilt as security groups and NACLs with explicit least-privilege paths between web, API, and data tiers.",
     "services_used": [
+      "Athena",
       "EC2",
-      "RDS",
+      "ECS Fargate",
       "ElastiCache",
-      "S3",
-      "ECS",
+      "Glue Data Catalog",
+      "IAM",
       "Lambda",
+      "RDS",
+      "S3",
       "SNS",
       "SQS",
-      "Athena",
-      "Glue",
       "VPC",
-      "IAM"
+      "VPC Security Groups + NACLs"
     ],
     "networking": {
       "vpc_count": 1,
+      "subnet_count": 2,
       "subnet_strategy": "public + private per AZ",
       "security_groups": [
-        "web-sg",
-        "api-sg",
-        "db-sg",
-        "lambda-sg"
+        "allow_internal-sg",
+        "allow_https-sg",
+        "deny_all_egress_default-sg"
       ]
     },
-    "total_resources": 30,
-    "direct_mappings": 24,
-    "partial_mappings": 4,
-    "no_equivalent": 2
+    "total_resources": 25,
+    "direct_mappings": 16,
+    "partial_mappings": 9,
+    "no_equivalent": 0
   },
   "risks": [
     {
@@ -1181,5 +1725,7 @@
       "Security groups and IAM roles require manual review before deployment"
     ],
     "deployment_notes": "Run `terraform init && terraform plan` to validate before applying. Review security groups and IAM roles manually \u2014 auto-generated policies may be overly permissive."
-  }
+  },
+  "status": "complete",
+  "errors": []
 }
