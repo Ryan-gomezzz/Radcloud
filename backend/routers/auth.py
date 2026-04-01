@@ -2,28 +2,36 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from datetime import datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.database import get_db
 from db.models import User
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-_SECRET = os.environ.get("JWT_SECRET", "radcloud-dev-secret-change-in-production")
+_jwt_raw = os.environ.get("JWT_SECRET")
+_SECRET = (
+    _jwt_raw.strip()
+    if _jwt_raw and _jwt_raw.strip()
+    else "radcloud-dev-secret-change-in-production"
+)
 _ALGORITHM = "HS256"
 _TOKEN_EXPIRE_DAYS = 30
 
-_pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 _bearer = HTTPBearer(auto_error=False)
 
 
@@ -59,11 +67,21 @@ class TokenResponse(BaseModel):
 # ---------- Helpers ----------
 
 def _hash_password(plain: str) -> str:
-    return _pwd_ctx.hash(plain)
+    data = plain.encode("utf-8")
+    if len(data) > 72:
+        data = data[:72]
+    return bcrypt.hashpw(data, bcrypt.gensalt()).decode("ascii")
 
 
 def _verify_password(plain: str, hashed: str) -> bool:
-    return _pwd_ctx.verify(plain, hashed)
+    try:
+        h = hashed.encode("utf-8")
+    except (UnicodeEncodeError, AttributeError):
+        return False
+    data = plain.encode("utf-8")
+    if len(data) > 72:
+        data = data[:72]
+    return bcrypt.checkpw(data, h)
 
 
 def _create_token(user_id: str) -> str:
@@ -142,16 +160,26 @@ async def signup(body: SignupRequest, db: AsyncSession = Depends(get_db)):
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=409, detail="Email already registered")
 
-    user = User(
-        name=body.name,
-        email=body.email,
-        company=body.company,
-        hashed_password=_hash_password(body.password),
-        cloud_environments=json.dumps(body.cloud_environments),
-    )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
+    try:
+        user = User(
+            name=body.name,
+            email=body.email,
+            company=body.company,
+            hashed_password=_hash_password(body.password),
+            cloud_environments=json.dumps(body.cloud_environments),
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+    except SQLAlchemyError:
+        logger.exception("signup database error")
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Database error during signup. Check Railway logs; ensure "
+                "RADCLOUD_DB_PATH is unset or a writable path (not blank)."
+            ),
+        ) from None
 
     return TokenResponse(token=_create_token(user.id), user=_user_to_response(user))
 

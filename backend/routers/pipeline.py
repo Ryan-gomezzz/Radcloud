@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,6 +17,60 @@ router = APIRouter(prefix="/pipeline", tags=["pipeline"])
 
 # plan_id -> { user_id, plan dict, modifications[], status }
 _plans: dict[str, dict] = {}
+
+# Demo plan from UI (mergeMigrationPlan / cached responses) — same id as frontend DEMO_MIGRATION_PLAN
+DEMO_PLAN_ID = "plan-demo-001"
+# user_id -> row (isolated per user so approve/modify state is stable)
+_demo_plan_sessions: dict[str, dict] = {}
+
+
+def _demo_plan_payload() -> dict:
+    return {
+        "plan_id": DEMO_PLAN_ID,
+        "phases": [
+            {
+                "id": "p1",
+                "name": "Infrastructure Setup",
+                "duration_days": 5,
+                "resources": ["VPC", "Subnets", "Security groups"],
+            },
+            {
+                "id": "p2",
+                "name": "Compute Migration",
+                "duration_days": 8,
+                "resources": ["GCE", "MIG", "Load balancers"],
+            },
+            {
+                "id": "p3",
+                "name": "Database Migration",
+                "duration_days": 12,
+                "resources": ["Cloud SQL", "Memorystore"],
+            },
+            {
+                "id": "p4",
+                "name": "Storage + CDN",
+                "duration_days": 4,
+                "resources": ["GCS", "Cloud CDN"],
+            },
+            {
+                "id": "p5",
+                "name": "Verification & Cutover",
+                "duration_days": 3,
+                "resources": ["DNS", "Monitoring"],
+            },
+        ],
+        "estimated_cost_delta": 312,
+        "risk_count_high": 2,
+        "architecture_mappings": [],
+        "cost_categories": [
+            {"category": "Compute", "before": 4200, "after": 4512},
+            {"category": "Database", "before": 1800, "after": 1950},
+            {"category": "Storage", "before": 890, "after": 920},
+            {"category": "Networking", "before": 640, "after": 710},
+            {"category": "Other", "before": 310, "after": 330},
+        ],
+        "risks": [],
+    }
 
 
 def register_migration_plan(user_id: str, plan: dict) -> None:
@@ -32,6 +86,15 @@ def register_migration_plan(user_id: str, plan: dict) -> None:
 
 
 def get_plan_row(plan_id: str, user_id: str) -> dict | None:
+    if plan_id == DEMO_PLAN_ID:
+        if user_id not in _demo_plan_sessions:
+            _demo_plan_sessions[user_id] = {
+                "user_id": user_id,
+                "plan": _demo_plan_payload(),
+                "modifications": [],
+                "status": "pending",
+            }
+        return _demo_plan_sessions[user_id]
     row = _plans.get(plan_id)
     if not row or row["user_id"] != user_id:
         return None
@@ -39,11 +102,13 @@ def get_plan_row(plan_id: str, user_id: str) -> dict | None:
 
 
 class SessionRef(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     session_id: str | None = None
 
 
 class ModifyBody(BaseModel):
-    notes: str
+    model_config = ConfigDict(extra="ignore")
+    notes: str = ""
     session_id: str | None = None
 
 

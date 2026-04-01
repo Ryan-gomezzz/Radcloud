@@ -1,0 +1,57 @@
+# Deploy full stack (Dockerfile: frontend build + FastAPI) to Railway from GitHub Actions.
+#
+# Required GitHub repository secrets (Settings → Secrets and variables → Actions):
+#   RAILWAY_TOKEN       — Create at https://railway.app/account/tokens (full access to your workspace)
+#   RAILWAY_PROJECT_ID  — Railway dashboard → your project → Settings → General → "Project ID"
+#
+# If either secret is missing, this workflow fails fast with a clear error (no empty `railway link -p ""`).
+# Alternative: connect the repo in Railway (Connect Repo) so pushes deploy without CI tokens.
+
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [main, devdev]
+  workflow_dispatch:
+
+env:
+  RAILWAY_SERVICE_NAME: radcloud
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Verify Railway secrets are configured
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          set -e
+          ok=0
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "::error::Missing secret RAILWAY_TOKEN. Add it: GitHub repo → Settings → Secrets and variables → Actions → New repository secret. Create a token at https://railway.app/account/tokens"
+            ok=1
+          fi
+          if [ -z "$RAILWAY_PROJECT_ID" ]; then
+            echo "::error::Missing secret RAILWAY_PROJECT_ID. Add it: Railway → your project → Settings → General → copy Project ID → GitHub → Actions secrets"
+            ok=1
+          fi
+          exit $ok
+
+      - name: Link project and deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          set -e
+          railway link -p "$RAILWAY_PROJECT_ID" -e production -s "$RAILWAY_SERVICE_NAME"
+          railway up --detach

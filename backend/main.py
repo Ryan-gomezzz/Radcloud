@@ -18,6 +18,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from agents import discovery, finops, mapping, planner, risk, watchdog
+from db.bootstrap import ensure_bootstrap_user
 from db.database import init_db
 from db.models import User
 from llm import call_llm_async
@@ -35,6 +36,10 @@ async def lifespan(_app: FastAPI):
         await init_db()
     except Exception:
         logger.exception("init_db failed — SQLite auth/session features may be unavailable")
+    try:
+        await ensure_bootstrap_user()
+    except Exception:
+        logger.exception("ensure_bootstrap_user failed — set RADCLOUD_BOOTSTRAP_* in Railway if you need a fixed login")
     try:
         await build_store()
     except Exception:
@@ -132,8 +137,15 @@ async def chat(request: Request):
     The backend calls Bedrock with a system prompt that guides the onboarding.
     Returns the AI's next message + any extracted structured data.
     """
-    body = await request.json()
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    if not isinstance(body, dict):
+        body = {}
     messages = body.get("messages", [])
+    if not isinstance(messages, list):
+        messages = []
 
     if _demo_mode_enabled():
         user_msgs = [m for m in messages if m.get("role") == "user" and str(m.get("content", "")).strip()]
