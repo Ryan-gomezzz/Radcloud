@@ -99,6 +99,26 @@ Rules:
 - For entries you don't want to change, return an empty ``aws_config_additions`` dict and the existing ``gap_notes``.
 """
 
+_NARRATIVE_SYSTEM_PROMPT = """\
+You are an AWS Solutions Architect writing a migration architecture summary. \
+You will receive a JSON object with two keys:
+
+- ``services_used`` — list of AWS services in the target architecture
+- ``mapping_summary`` — aggregated counts and key resource mappings
+
+Write a concise architecture narrative (2–3 paragraphs, ~150–250 words) that:
+
+1. Describes the target AWS architecture at a high level — VPC layout, \
+compute tier, data tier, serverless components.
+2. Highlights key migration decisions (e.g. Cloud Run → Fargate, \
+Cloud SQL → Multi-AZ RDS, Pub/Sub → SNS+SQS).
+3. Notes any gaps or areas needing manual review.
+
+Write in a professional, technical tone suitable for a migration proposal. \
+Do NOT use markdown headings, bullet lists, or code blocks — write flowing \
+prose paragraphs only. Return ONLY the narrative text, no JSON wrapping.
+"""
+
 
 # ---------------------------------------------------------------------------
 # Main entry point
@@ -168,6 +188,11 @@ async def run(context: dict) -> dict:
     # --- LLM enrichment pass (optional, fails gracefully) ---
     rows = await _enrich_with_llm(rows, context)
     context["aws_mapping"] = rows
+
+    # --- LLM architecture narrative (optional, fails gracefully) ---
+    narrative = await _generate_narrative(rows, context)
+    if narrative:
+        context["aws_architecture"]["summary"] = narrative
 
     return context
 
@@ -538,3 +563,90 @@ def _merge_enrichments(
         )
 
     return rows
+
+
+# ---------------------------------------------------------------------------
+# Architecture narrative generation (Task 4.2)
+# ---------------------------------------------------------------------------
+
+async def _generate_narrative(
+    rows: list[dict[str, Any]],
+    context: dict,
+) -> str | None:
+    """Call Claude to generate a custom architecture narrative.
+
+    Returns the narrative string, or ``None`` if the LLM call fails
+    (in which case ``_ARCH_SUMMARY`` remains in the architecture dict).
+    """
+    arch = context.get("aws_architecture", {})
+
+    # Build a compact summary for the prompt.
+    type_counts: dict[str, int] = {}
+    for m in rows:
+        svc = m["aws_service"]
+        type_counts[svc] = type_counts.get(svc, 0) + 1
+
+    key_mappings = []
+    for m in rows:
+        if m["gap_flag"] or m["gcp_type"] in ("compute_instance", "cloud_sql", "cloud_run", "memorystore_redis"):
+            key_mappings.append({
+                "gcp": f"{m['gcp_service']} ({m['gcp_type']})",
+                "aws": f"{m['aws_service']} ({m['aws_type']})",
+                "confidence": m["mapping_confidence"],
+                "gap_notes": m.get("gap_notes"),
+            })
+
+    prompt_data = {
+        "services_used": arch.get("services_used", []),
+        "mapping_summary": {
+            "total_resources": arch.get("total_resources", len(rows)),
+            "direct_mappings": arch.get("direct_mappings", 0),
+            "partial_mappings": arch.get("partial_mappings", 0),
+            "no_equivalent": arch.get("no_equivalent", 0),
+            "service_counts": type_counts,
+            "key_mappings": key_mappings[:15],  # cap to avoid token bloat
+        },
+    }
+
+    try:
+        raw_text = await call_llm_async(
+            system=_NARRATIVE_SYSTEM_PROMPT,
+            messages=[{
+                "role": "user",
+                "content": (
+                    "Generate an architecture narrative for this "
+                    "GCP-to-AWS migration:\n\n"
+                    + json.dumps(prompt_data, indent=2, default=str)
+                ),
+            }],
+            max_tokens=1024,
+            temperature=0.3,
+        )
+    except Exception as exc:
+        logger.warning("Mapping agent: narrative generation failed: %s", exc)
+        context.setdefault("errors", []).append({
+            "agent": "mapping",
+            "error": f"Architecture narrative skipped (using default): {exc}",
+        })
+        return None
+
+    if not raw_text or not raw_text.strip():
+        return None
+
+    # Clean up: strip any accidental markdown/fences.
+    text = raw_text.strip()
+    if text.startswith("```"):
+        first_nl = text.find("\n")
+        if first_nl != -1:
+            text = text[first_nl + 1:]
+        last_fence = text.rfind("```")
+        if last_fence != -1:
+            text = text[:last_fence].rstrip()
+        text = text.strip()
+
+    # Validate: must be at least 50 chars of prose.
+    if len(text) < 50:
+        logger.warning("Mapping agent: narrative too short (%d chars)", len(text))
+        return None
+
+    return text
