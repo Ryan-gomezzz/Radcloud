@@ -1,0 +1,32 @@
+# Deploy full stack (Dockerfile: frontend build + FastAPI) to Railway.
+# Required GitHub repo secrets:
+#   RAILWAY_TOKEN       — Account token from https://railway.app/account/tokens
+#   RAILWAY_PROJECT_ID  — Project ID (Railway project settings → General)
+# Optional: change service name below if your Railway service is not "radcloud".
+
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [main, devdev]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Link and deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway link -p "${{ secrets.RAILWAY_PROJECT_ID }}" -e production -s radcloud
+          railway up --detach
